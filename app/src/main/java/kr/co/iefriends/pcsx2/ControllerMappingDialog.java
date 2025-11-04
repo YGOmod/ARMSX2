@@ -24,13 +24,13 @@ package kr.co.iefriends.pcsx2;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.view.InputDevice;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -72,7 +72,9 @@ public class ControllerMappingDialog extends DialogFragment {
                 .setPositiveButton(android.R.string.ok, null)
                 .setNeutralButton(R.string.controller_mapping_reset, (d, which) -> {
                     ControllerMappingManager.resetToDefaults();
-                    if (adapter != null) adapter.updateMappings();
+                    if (adapter != null) {
+                        adapter.updateMappings();
+                    }
                     cancelWaiting();
                 })
                 .create();
@@ -83,6 +85,26 @@ public class ControllerMappingDialog extends DialogFragment {
             decor.setOnGenericMotionListener((v, event) -> handleMotionEvent(event));
         }
         return dialog;
+    }
+
+    @Override
+    public void onDestroyView() {
+        // Prevent memory leaks
+        if (waitingView != null) {
+            waitingView = null;
+        }
+        if (adapter != null) {
+            adapter = null;
+        }
+        if (dialog != null) {
+            dialog.setOnKeyListener(null);
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.getDecorView().setOnGenericMotionListener(null);
+            }
+            dialog = null;
+        }
+        super.onDestroyView();
     }
 
     private void beginRebind(@NonNull ControllerMappingManager.Action action) {
@@ -121,16 +143,25 @@ public class ControllerMappingDialog extends DialogFragment {
     }
 
     private boolean handleMotionEvent(@NonNull MotionEvent event) {
-        if (waitingForAction == null) return false;
-        if (event.getAction() != MotionEvent.ACTION_MOVE) return false;
+        if (waitingForAction == null) {
+            return false;
+        }
+        if (event.getAction() != MotionEvent.ACTION_MOVE) {
+            return false;
+        }
         if (!event.isFromSource(InputDevice.SOURCE_JOYSTICK) && !event.isFromSource(InputDevice.SOURCE_GAMEPAD)) {
             return false;
         }
 
         float l2 = event.getAxisValue(MotionEvent.AXIS_LTRIGGER);
-        if (l2 == 0f) l2 = event.getAxisValue(MotionEvent.AXIS_BRAKE);
+        if (l2 == 0f) {
+            l2 = event.getAxisValue(MotionEvent.AXIS_BRAKE);
+        }
+
         float r2 = event.getAxisValue(MotionEvent.AXIS_RTRIGGER);
-        if (r2 == 0f) r2 = event.getAxisValue(MotionEvent.AXIS_GAS);
+        if (r2 == 0f) {
+            r2 = event.getAxisValue(MotionEvent.AXIS_GAS);
+        }
 
         final float threshold = 0.5f;
         int keyCode = ControllerMappingManager.NO_MAPPING;

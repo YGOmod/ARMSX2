@@ -33,6 +33,8 @@ import java.util.concurrent.ThreadFactory;
 final class RetroAchievementsBridge {
 
     private static final String TAG = "RetroAchievementsBridge";
+    static final int LOGIN_REASON_USER = 0;
+    static final int LOGIN_REASON_TOKEN_INVALID = 1;
 
     interface Listener {
         void onStateUpdated(State state);
@@ -47,9 +49,6 @@ final class RetroAchievementsBridge {
     interface LoginCallback {
         void onResult(boolean success, String message);
     }
-
-    static final int LOGIN_REASON_USER = 0;
-    static final int LOGIN_REASON_TOKEN_INVALID = 1;
 
     static final class State {
         final boolean achievementsEnabled;
@@ -76,27 +75,27 @@ final class RetroAchievementsBridge {
         final boolean hasRichPresence;
 
         State(boolean achievementsEnabled,
-              boolean loggedIn,
-              String username,
-              String displayName,
-              String avatarPath,
-              int points,
-              int softcorePoints,
-              int unreadMessages,
-              boolean hardcorePreference,
-              boolean hardcoreActive,
-              boolean hasActiveGame,
-              String gameTitle,
-              String richPresence,
-              String gameIconPath,
-              int unlockedAchievements,
-              int totalAchievements,
-              int unlockedPoints,
-              int totalPoints,
-              int gameId,
-              boolean hasAchievements,
-              boolean hasLeaderboards,
-              boolean hasRichPresence) {
+                boolean loggedIn,
+                String username,
+                String displayName,
+                String avatarPath,
+                int points,
+                int softcorePoints,
+                int unreadMessages,
+                boolean hardcorePreference,
+                boolean hardcoreActive,
+                boolean hasActiveGame,
+                String gameTitle,
+                String richPresence,
+                String gameIconPath,
+                int unlockedAchievements,
+                int totalAchievements,
+                int unlockedPoints,
+                int totalPoints,
+                int gameId,
+                boolean hasAchievements,
+                boolean hasLeaderboards,
+                boolean hasRichPresence) {
             this.achievementsEnabled = achievementsEnabled;
             this.loggedIn = loggedIn;
             this.username = username != null ? username : "";

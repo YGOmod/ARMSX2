@@ -23,13 +23,12 @@ package kr.co.iefriends.pcsx2;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
-import android.graphics.drawable.Drawable;
 
 import androidx.annotation.Nullable;
 

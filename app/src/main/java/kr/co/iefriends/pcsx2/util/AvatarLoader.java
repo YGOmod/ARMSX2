@@ -55,7 +55,7 @@ public final class AvatarLoader {
 
     static {
         final long maxMemoryKb = Runtime.getRuntime().maxMemory() / 1024L;
-        MAX_CACHE_KB = (int) Math.min(maxMemoryKb / 16L, 2560L); 
+        MAX_CACHE_KB = (int) Math.min(maxMemoryKb / 16L, 2560L);
         CACHE = new android.util.LruCache<String, Bitmap>(MAX_CACHE_KB) {
             @Override
             protected int sizeOf(String key, Bitmap value) {

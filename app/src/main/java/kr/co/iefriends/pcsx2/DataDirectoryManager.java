@@ -50,7 +50,7 @@ final class DataDirectoryManager {
     private static final String KEY_PROMPT_DONE = "data_dir_prompt_done";
     private static final String TAG = "DataDirManager";
 
-    private DataDirectoryManager() {}
+    private DataDirectoryManager() { }
 
     static File getDataRoot(Context context) {
         SharedPreferences prefs = getPrefs(context);
@@ -118,7 +118,9 @@ final class DataDirectoryManager {
             return true;
         }
         if (targetPath.startsWith(sourcePath + File.separator)) {
-            try { DebugLog.e(TAG, "Target is nested inside source: " + targetPath); } catch (Throwable ignored) {}
+            try {
+                DebugLog.e(TAG, "Target is nested inside source: " + targetPath);
+            } catch (Throwable ignored) { }
             return false;
         }
         if (!source.exists()) {
@@ -127,20 +129,28 @@ final class DataDirectoryManager {
         if (!target.exists()) {
             File parent = target.getParentFile();
             if (parent != null && !parent.exists() && !parent.mkdirs()) {
-                try { DebugLog.e(TAG, "Failed to create parent directory: " + parent); } catch (Throwable ignored) {}
+                try {
+                    DebugLog.e(TAG, "Failed to create parent directory: " + parent);
+                } catch (Throwable ignored) { }
                 return false;
             }
             if (source.renameTo(target)) {
-                try { DebugLog.d(TAG, "Renamed data root to " + targetPath); } catch (Throwable ignored) {}
+                try {
+                    DebugLog.d(TAG, "Renamed data root to " + targetPath);
+                } catch (Throwable ignored) { }
                 return true;
             }
         }
         if (!ensureDir(target)) {
-            try { DebugLog.e(TAG, "Unable to ensure target directory: " + targetPath); } catch (Throwable ignored) {}
+            try {
+                DebugLog.e(TAG, "Unable to ensure target directory: " + targetPath);
+            } catch (Throwable ignored) { }
             return false;
         }
         if (!copyRecursively(source, target)) {
-            try { DebugLog.e(TAG, "Recursive copy failed from " + sourcePath + " to " + targetPath); } catch (Throwable ignored) {}
+            try {
+                DebugLog.e(TAG, "Recursive copy failed from " + sourcePath + " to " + targetPath);
+            } catch (Throwable ignored) { }
             return false;
         }
         clearDirectory(source);
@@ -215,12 +225,16 @@ final class DataDirectoryManager {
     private static boolean copyRecursively(File source, File target) {
         if (source.isDirectory()) {
             if (!target.exists() && !target.mkdirs()) {
-                try { DebugLog.e(TAG, "Failed to create directory: " + target); } catch (Throwable ignored) {}
+                try {
+                    DebugLog.e(TAG, "Failed to create directory: " + target);
+                } catch (Throwable ignored) { }
                 return false;
             }
             File[] children = source.listFiles();
             if (children == null) {
-                try { DebugLog.e(TAG, "Cannot list directory contents: " + source); } catch (Throwable ignored) {}
+                try {
+                    DebugLog.e(TAG, "Cannot list directory contents: " + source);
+                } catch (Throwable ignored) { }
                 return false;
             }
             for (File child : children) {
@@ -232,11 +246,13 @@ final class DataDirectoryManager {
         }
         File parent = target.getParentFile();
         if (parent != null && !parent.exists() && !parent.mkdirs()) {
-            try { DebugLog.e(TAG, "Failed to create parent for file: " + parent); } catch (Throwable ignored) {}
+            try {
+                DebugLog.e(TAG, "Failed to create parent for file: " + parent);
+            } catch (Throwable ignored) { }
             return false;
         }
         try (InputStream in = new FileInputStream(source);
-             OutputStream out = new FileOutputStream(target)) {
+                OutputStream out = new FileOutputStream(target)) {
             byte[] buffer = new byte[1024 * 1024];
             int read;
             while ((read = in.read(buffer)) != -1) {
@@ -244,7 +260,9 @@ final class DataDirectoryManager {
             }
             out.flush();
         } catch (IOException e) {
-            try { DebugLog.e(TAG, "Copy failed for " + source + " -> " + target + ": " + e.getMessage()); } catch (Throwable ignored) {}
+            try {
+                DebugLog.e(TAG, "Copy failed for " + source + " -> " + target + ": " + e.getMessage());
+            } catch (Throwable ignored) { }
             return false;
         }
         return true;
@@ -283,18 +301,24 @@ final class DataDirectoryManager {
         try {
             String[] assets = assetMgr.list(srcPath);
             if (assets == null) {
-                try { DebugLog.e(TAG, "Asset list returned null for " + srcPath); } catch (Throwable ignored) {}
+                try {
+                    DebugLog.e(TAG, "Asset list returned null for " + srcPath);
+                } catch (Throwable ignored) { }
                 return;
             }
             File destPath = new File(getDataRoot(context), srcPath);
             if (assets.length == 0) {
                 if (!copyFile(context, srcPath, destPath.getAbsolutePath())) {
-                    try { DebugLog.e(TAG, "Failed to copy asset file " + srcPath + " to " + destPath); } catch (Throwable ignored) {}
+                    try {
+                        DebugLog.e(TAG, "Failed to copy asset file " + srcPath + " to " + destPath);
+                    } catch (Throwable ignored) { }
                 }
             } else {
                 if (!destPath.exists()) {
                     if (!destPath.mkdirs()) {
-                        try { DebugLog.e(TAG, "Failed to create destination directory for assets: " + destPath); } catch (Throwable ignored) {}
+                        try {
+                            DebugLog.e(TAG, "Failed to create destination directory for assets: " + destPath);
+                        } catch (Throwable ignored) { }
                         return;
                     }
                 }
@@ -303,7 +327,9 @@ final class DataDirectoryManager {
                 }
             }
         } catch (IOException ignored) {
-            try { DebugLog.e(TAG, "IOException while copying assets: " + ignored.getMessage()); } catch (Throwable ignored2) {}
+            try {
+                DebugLog.e(TAG, "IOException while copying assets: " + ignored.getMessage());
+            } catch (Throwable ignored2) { }
         }
     }
 
@@ -318,7 +344,9 @@ final class DataDirectoryManager {
             File parent = outFile.getParentFile();
             if (parent != null && !parent.exists()) {
                 if (!parent.mkdirs()) {
-                    try { DebugLog.e(TAG, "Failed to create parent for asset: " + parent); } catch (Throwable ignored) {}
+                    try {
+                        DebugLog.e(TAG, "Failed to create parent for asset: " + parent);
+                    } catch (Throwable ignored) { }
                     return false;
                 }
             }
@@ -337,14 +365,20 @@ final class DataDirectoryManager {
             }
             success = true;
         } catch (IOException ignored) {
-            try { DebugLog.e(TAG, "Failed to copy asset " + srcFile + " -> " + destFile + ": " + ignored.getMessage()); } catch (Throwable ignored2) {}
+            try {
+                DebugLog.e(TAG, "Failed to copy asset " + srcFile + " -> " + destFile + ": " + ignored.getMessage());
+            } catch (Throwable ignored2) { }
             success = false;
         } finally {
             if (is != null) {
-                try { is.close(); } catch (IOException ignored) {}
+                try {
+                    is.close();
+                } catch (IOException ignored) { }
             }
             if (os != null) {
-                try { os.close(); } catch (IOException ignored) {}
+                try {
+                    os.close();
+                } catch (IOException ignored) { }
             }
         }
         return success;
@@ -355,7 +389,9 @@ final class DataDirectoryManager {
             return false;
         }
         if (!dir.exists() && !dir.mkdirs()) {
-            try { DebugLog.e(TAG, "Unable to create directory for access probe: " + dir); } catch (Throwable ignored) {}
+            try {
+                DebugLog.e(TAG, "Unable to create directory for access probe: " + dir);
+            } catch (Throwable ignored) { }
             return false;
         }
         File probe = new File(dir, ".armsx2_write_probe");
@@ -366,14 +402,20 @@ final class DataDirectoryManager {
             fos.flush();
             return true;
         } catch (IOException e) {
-            try { DebugLog.e(TAG, "Write probe failed for " + dir + ": " + e.getMessage()); } catch (Throwable ignored) {}
+            try {
+                DebugLog.e(TAG, "Write probe failed for " + dir + ": " + e.getMessage());
+            } catch (Throwable ignored) { }
             return false;
         } finally {
             if (fos != null) {
-                try { fos.close(); } catch (IOException ignored) {}
+                try {
+                    fos.close();
+                } catch (IOException ignored) { }
             }
             if (probe.exists() && !probe.delete()) {
-                try { DebugLog.d(TAG, "Failed to delete probe file " + probe); } catch (Throwable ignored) {}
+                try {
+                    DebugLog.d(TAG, "Failed to delete probe file " + probe);
+                } catch (Throwable ignored) { }
             }
         }
     }

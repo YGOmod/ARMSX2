@@ -36,30 +36,44 @@ public final class DeviceProfiles {
     private static final String FEATURE_GOOGLE_DESKTOP = PackageManager.FEATURE_PC;
     private static final String FEATURE_CHROME_OS = "org.chromium.arc";
 
-    private DeviceProfiles() {}
+    private DeviceProfiles() { }
 
     public static boolean isAndroidTV(Context context) {
-        if (context == null) return false;
+        if (context == null) {
+            return false;
+        }
         UiModeManager uiModeManager = (UiModeManager) context.getSystemService(Context.UI_MODE_SERVICE);
-        if (uiModeManager == null) return false;
+        if (uiModeManager == null) {
+            return false;
+        }
         int mode = uiModeManager.getCurrentModeType();
-        return mode == Configuration.UI_MODE_TYPE_TELEVISION || uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_APPLIANCE;
+        return mode == Configuration.UI_MODE_TYPE_TELEVISION || mode == Configuration.UI_MODE_TYPE_APPLIANCE;
     }
 
     public static boolean isSamsungDex(Context context) {
-        if (context == null) return false;
+        if (context == null) {
+            return false;
+        }
         PackageManager pm = context.getPackageManager();
-        if (pm == null) return false;
+        if (pm == null) {
+            return false;
+        }
         boolean hasDexFeature = pm.hasSystemFeature(FEATURE_SAMSUNG_DEX) || pm.hasSystemFeature(FEATURE_SAMSUNG_DEX_ALT);
-        if (!hasDexFeature) return false;
+        if (!hasDexFeature) {
+            return false;
+        }
         // Some Samsung devices report the feature even when Dex is not active. If the manufacturer isn't Samsung, bail out.
         return TextUtils.equals(Build.MANUFACTURER, "samsung") || TextUtils.equals(Build.BRAND, "samsung");
     }
 
     public static boolean isChromebook(Context context) {
-        if (context == null) return false;
+        if (context == null) {
+            return false;
+        }
         PackageManager pm = context.getPackageManager();
-        if (pm == null) return false;
+        if (pm == null) {
+            return false;
+        }
         return pm.hasSystemFeature(FEATURE_GOOGLE_DESKTOP) || pm.hasSystemFeature(FEATURE_CHROME_OS);
     }
 

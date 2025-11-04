@@ -2,110 +2,100 @@ package kr.co.iefriends.pcsx2;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.GameManager;
+import android.app.GameState;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.net.Uri;
-import android.content.pm.ActivityInfo;
+import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
-import android.provider.OpenableColumns;
-import android.text.TextUtils;
-import android.view.InputDevice;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.util.SparseIntArray;
-import android.widget.Toast;
-import android.widget.TextView;
-import android.widget.ProgressBar;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.app.GameManager;
-import android.app.GameState;
-import android.os.Build;
-import android.provider.Settings;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.CompoundButton;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.util.TypedValue;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.OpenableColumns;
+import android.provider.Settings;
+import android.text.TextUtils;
+import android.util.SparseIntArray;
+import android.util.TypedValue;
+import android.view.InputDevice;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
-
-import kr.co.iefriends.pcsx2.util.DebugLog;
-import kr.co.iefriends.pcsx2.util.DeviceProfiles;
-import kr.co.iefriends.pcsx2.input.ControllerMappingManager;
-import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
+import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
-import java.security.DigestInputStream;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.lang.ref.WeakReference;
 import java.util.Locale;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.zip.Inflater;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+
+import kr.co.iefriends.pcsx2.input.ControllerMappingManager;
+import kr.co.iefriends.pcsx2.util.DebugLog;
+import kr.co.iefriends.pcsx2.util.DeviceProfiles;
 
 public class MainActivity extends AppCompatActivity {
     private String m_szGamefile = "";
@@ -124,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     private View drawerRaSection;
     private TextView drawerRaTitle;
     private TextView drawerRaSubtitle;
-    private android.widget.ImageView drawerRaIcon;
+    private ImageView drawerRaIcon;
     private TextView drawerRaLabel;
     private RetroAchievementsBridge.State currentRetroAchievementsState;
     private boolean lastRetroAchievementsLoggedIn = false;
@@ -147,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     private View homeContainer;
     private View emptyContainer;
     private android.widget.EditText etSearch;
-    private android.widget.ImageView bgImage;
+    private ImageView bgImage;
     private RecyclerView rvGames;
     private GridLayoutManager gamesGridLayoutManager;
     private SpacingDecoration gameSpacingDecoration;
@@ -193,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
     private final SparseIntArray analogStates = new SparseIntArray();
     private boolean hatUp, hatDown, hatLeft, hatRight;
     private boolean disableTouchControls;
-    
+
     private int currentControllerMode = 0; // 0=2 Sticks, 1=1 Stick+Face, 2=D-Pad Only
 
     private final RetroAchievementsBridge.Listener retroAchievementsListener = new RetroAchievementsBridge.Listener() {
@@ -236,7 +226,9 @@ public class MainActivity extends AppCompatActivity {
         }
         File dir = new File(base, "armsx2_covers");
         if (!dir.exists() && !dir.mkdirs()) {
-            try { DebugLog.e("Covers", "Failed to create cover cache directory: " + dir); } catch (Throwable ignored) {}
+            try {
+                DebugLog.e("Covers", "Failed to create cover cache directory: " + dir);
+            } catch (Throwable ignored) { }
             return null;
         }
         return dir;
@@ -268,8 +260,8 @@ public class MainActivity extends AppCompatActivity {
         sInstanceRef = new WeakReference<>(this);
         setContentView(R.layout.activity_main);
         disableTouchControls = DeviceProfiles.isTvOrDesktop(this);
-	// Keep screen awake during gameplay
-	getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // Keep screen awake during gameplay
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (Build.VERSION.SDK_INT >= 33) {
             try {
@@ -277,14 +269,14 @@ public class MainActivity extends AppCompatActivity {
                 if (gm != null) {
                     gm.setGameState(new GameState(false, GameState.MODE_GAMEPLAY_INTERRUPTIBLE));
                 }
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
         }
 
         try {
             if (NativeApp.isFullscreenUIEnabled()) {
                 setOnScreenControlsVisible(false);
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
 
         // Hide title/action bar explicitly
         if (getSupportActionBar() != null) getSupportActionBar().hide();
@@ -293,72 +285,76 @@ public class MainActivity extends AppCompatActivity {
         applyFullscreen();
         DataDirectoryManager.copyAssetAll(getApplicationContext(), "resources");
 
-    Initialize();
+        Initialize();
 
-    ControllerMappingManager.init(this);
-    refreshVibrationPreference();
+        ControllerMappingManager.init(this);
+        refreshVibrationPreference();
 
-    // Load on-screen controls hide timeout
-    loadHideTimeoutFromPrefs();
+        // Load on-screen controls hide timeout
+        loadHideTimeoutFromPrefs();
 
-    loadOnScreenUiScalePreference();
-    currentOnScreenUiStyle = resolveOnScreenUiStylePreference();
+        loadOnScreenUiScalePreference();
+        currentOnScreenUiStyle = resolveOnScreenUiStylePreference();
         if (!disableTouchControls) {
             makeButtonTouch();
         }
 
-    setSurfaceView(new SDLSurface(this));
+        setSurfaceView(new SDLSurface(this));
 
         maybeStartOnboardingFlow();
 
-    // Cache on-screen pad containers
-    llPadSelectStart = findViewById(R.id.ll_pad_select_start);
-    llPadRight = findViewById(R.id.ll_pad_right);
-    JoystickView joystickLeft = findViewById(R.id.joystick_left);
-    DPadView dpadView = findViewById(R.id.dpad_view);
-    setupInGameDrawer();
-    setupTouchRevealOverlay();
-    // Home UI
-    drawerLayout = findViewById(R.id.drawer_root);
-    homeContainer = findViewById(R.id.home_container);
-    rvGames = findViewById(R.id.rv_games);
-    emptyContainer = findViewById(R.id.empty_container);
-    tvEmpty = findViewById(R.id.tv_empty);
-    etSearch = findViewById(R.id.et_search);
-    bgImage = findViewById(R.id.bg_image);
-    if (rvGames != null) {
-        gamesGridLayoutManager = new GridLayoutManager(this, getGameGridSpanCount());
-        rvGames.setLayoutManager(gamesGridLayoutManager);
-        gamesAdapter = new GamesAdapter(new ArrayList<>(), entry -> onGameSelected(entry));
-        rvGames.setAdapter(gamesAdapter);
-        // Controller navigation
-    rvGames.setFocusable(true);
-    rvGames.setFocusableInTouchMode(true);
-        rvGames.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
-        gameSpacingDecoration = new SpacingDecoration(getResources().getDimensionPixelSize(R.dimen.game_selector_tile_spacing));
-        rvGames.addItemDecoration(gameSpacingDecoration);
-        rvGames.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus && gamesAdapter.getItemCount() > 0) {
-                rvGames.post(() -> {
-                    RecyclerView.ViewHolder vh = rvGames.findViewHolderForAdapterPosition(0);
-                    if (vh != null) vh.itemView.requestFocus();
-                });
-            }
-        });
-        applyGameGridConfig();
-    }
+        // Cache on-screen pad containers
+        llPadSelectStart = findViewById(R.id.ll_pad_select_start);
+        llPadRight = findViewById(R.id.ll_pad_right);
+        JoystickView joystickLeft = findViewById(R.id.joystick_left);
+        DPadView dpadView = findViewById(R.id.dpad_view);
+        setupInGameDrawer();
+        setupTouchRevealOverlay();
+        // Home UI
+        drawerLayout = findViewById(R.id.drawer_root);
+        homeContainer = findViewById(R.id.home_container);
+        rvGames = findViewById(R.id.rv_games);
+        emptyContainer = findViewById(R.id.empty_container);
+        tvEmpty = findViewById(R.id.tv_empty);
+        etSearch = findViewById(R.id.et_search);
+        bgImage = findViewById(R.id.bg_image);
+        if (rvGames != null) {
+            gamesGridLayoutManager = new GridLayoutManager(this, getGameGridSpanCount());
+            rvGames.setLayoutManager(gamesGridLayoutManager);
+            gamesAdapter = new GamesAdapter(new ArrayList<>(), entry -> onGameSelected(entry));
+            rvGames.setAdapter(gamesAdapter);
+            // Controller navigation
+            rvGames.setFocusable(true);
+            rvGames.setFocusableInTouchMode(true);
+            rvGames.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
+            gameSpacingDecoration = new SpacingDecoration(getResources().getDimensionPixelSize(R.dimen.game_selector_tile_spacing));
+            rvGames.addItemDecoration(gameSpacingDecoration);
+            rvGames.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus && gamesAdapter.getItemCount() > 0) {
+                    rvGames.post(() -> {
+                        RecyclerView.ViewHolder vh = rvGames.findViewHolderForAdapterPosition(0);
+                        if (vh != null) {
+                            vh.itemView.requestFocus();
+                        }
+                    });
+                }
+            });
+            applyGameGridConfig();
+        }
         enforceTouchControlsPolicy();
         // Search text change -> filter
         if (etSearch != null) {
             etSearch.addTextChangedListener(new android.text.TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
                 @Override public void afterTextChanged(android.text.Editable s) {
-                    if (gamesAdapter != null) gamesAdapter.setFilter(s != null ? s.toString() : "");
+                    if (gamesAdapter != null) {
+                        gamesAdapter.setFilter(s != null ? s.toString() : "");
+                    }
                 }
             });
         }
-        // FAB actions: convert ISO to CHD 
+        // FAB actions: convert ISO to CHD
         com.google.android.material.floatingactionbutton.FloatingActionButton fab = findViewById(R.id.fab_actions);
         if (fab != null) {
             fab.setOnClickListener(v -> {
@@ -382,9 +378,9 @@ public class MainActivity extends AppCompatActivity {
             toolbar.setTitle(displayName + " Game Selector");
             try {
                 androidx.appcompat.graphics.drawable.DrawerArrowDrawable dd = new androidx.appcompat.graphics.drawable.DrawerArrowDrawable(this);
-                dd.setProgress(0f); 
+                dd.setProgress(0f);
                 toolbar.setNavigationIcon(dd);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
             toolbar.setNavigationOnClickListener(v -> {
                 if (drawerLayout != null) drawerLayout.openDrawer(GravityCompat.START);
             });
@@ -428,15 +424,17 @@ public class MainActivity extends AppCompatActivity {
                             Class<?> rnClass = Class.forName("kr.co.iefriends.pcsx2.RNActivity");
                             startActivity(new Intent(this, rnClass));
                         } catch (Throwable t) {
-                            try { Toast.makeText(this, "React Native screen unavailable", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+                            try {
+                                Toast.makeText(this, "React Native screen unavailable", Toast.LENGTH_SHORT).show();
+                            } catch (Throwable ignored) { }
                         }
                         return true;
                     }
                     return false;
                 });
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
         }
-    // Navigation drawer menus
+        // Navigation drawer menus
         NavigationView navStart = findViewById(R.id.nav_view_start);
         NavigationView.OnNavigationItemSelectedListener listener = item -> {
             int id = item.getItemId();
@@ -449,68 +447,78 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(si, 7722);
             } else if (id == R.id.menu_choose_folder) {
                 pickGamesFolder();
-        } else if (id == R.id.menu_refresh) {
-            if (gamesFolderUri != null) scanGamesFolder(gamesFolderUri);
-            else try { Toast.makeText(this, "Choose a games folder first", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
-        } else if (id == R.id.menu_covers) {
+            } else if (id == R.id.menu_refresh) {
+                if (gamesFolderUri != null) scanGamesFolder(gamesFolderUri);
+            else try {
+                    Toast.makeText(this, "Choose a games folder first", Toast.LENGTH_SHORT).show();
+                } catch (Throwable ignored) { }
+            } else if (id == R.id.menu_covers) {
             promptForCoversUrl();
-        } else if (id == R.id.menu_clear_cover_url) {
+            } else if (id == R.id.menu_clear_cover_url) {
             setCoversUrlTemplate("");
-            try { Toast.makeText(this, "Cover URL cleared.", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+            try {
+                Toast.makeText(this, "Cover URL cleared.", Toast.LENGTH_SHORT).show();
+            } catch (Throwable ignored) { }
             if (gamesFolderUri != null) scanGamesFolder(gamesFolderUri);
-        } else if (id == R.id.menu_bg_landscape) {
+            } else if (id == R.id.menu_bg_landscape) {
             pickBackgroundImage(false);
-        } else if (id == R.id.menu_bg_portrait) {
+            } else if (id == R.id.menu_bg_portrait) {
             pickBackgroundImage(true);
-        } else if (id == R.id.menu_bg_clear) {
+            } else if (id == R.id.menu_bg_clear) {
             clearBackgroundImages();
-        }
-        if (drawerLayout != null) drawerLayout.closeDrawers();
-        return true;
-    };
-    if (navStart != null) navStart.setNavigationItemSelectedListener(listener);
-    try { if (drawerLayout != null) drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END); } catch (Throwable ignored) {}
-
-    try {
-        if (navStart != null && navStart.getHeaderCount() > 0) {
-            View header = navStart.getHeaderView(0);
-            View img = header.findViewById(R.id.header_image);
-            View imgBlur = header.findViewById(R.id.header_image_blur);
-            android.graphics.Bitmap bmp = loadHeaderBitmapFromAssets();
-            android.graphics.Bitmap blurBmp = loadHeaderBlurBitmapFromAssets();
-            if (img instanceof android.widget.ImageView && bmp != null) {
-                ((android.widget.ImageView) img).setImageBitmap(bmp);
             }
-            android.graphics.Bitmap useForBlur = blurBmp != null ? blurBmp : bmp;
-            if (imgBlur instanceof android.widget.ImageView && useForBlur != null) {
-                ((android.widget.ImageView) imgBlur).setImageBitmap(useForBlur);
-                if (android.os.Build.VERSION.SDK_INT >= 31) {
-                    try {
-                        imgBlur.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(18f, 18f, android.graphics.Shader.TileMode.CLAMP));
-                    } catch (Throwable ignored) {}
+            if (drawerLayout != null) {
+                drawerLayout.closeDrawers();
+            }
+            return true;
+        };
+        if (navStart != null) navStart.setNavigationItemSelectedListener(listener);
+        try {
+            if (drawerLayout != null) {
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END);
+            }
+        } catch (Throwable ignored) { }
+
+        try {
+            if (navStart != null && navStart.getHeaderCount() > 0) {
+                View header = navStart.getHeaderView(0);
+                View img = header.findViewById(R.id.header_image);
+                View imgBlur = header.findViewById(R.id.header_image_blur);
+                Bitmap bmp = loadHeaderBitmapFromAssets();
+                Bitmap blurBmp = loadHeaderBlurBitmapFromAssets();
+                if (img instanceof ImageView && bmp != null) {
+                    ((ImageView) img).setImageBitmap(bmp);
+                }
+                Bitmap useForBlur = blurBmp != null ? blurBmp : bmp;
+                if (imgBlur instanceof ImageView && useForBlur != null) {
+                    ((ImageView) imgBlur).setImageBitmap(useForBlur);
+                    if (android.os.Build.VERSION.SDK_INT >= 31) {
+                        try {
+                            imgBlur.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(18f, 18f, android.graphics.Shader.TileMode.CLAMP));
+                        } catch (Throwable ignored) {}
+                    }
                 }
             }
-        }
-    } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
 
-    showHome(true);
-    if (tvEmpty != null) tvEmpty.setVisibility(View.VISIBLE);
+        showHome(true);
+        if (tvEmpty != null) tvEmpty.setVisibility(View.VISIBLE);
 
-    try {
-        android.content.SharedPreferences sp = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        String saved = sp.getString(PREF_GAMES_URI, null);
-        if (saved != null) {
-            gamesFolderUri = Uri.parse(saved);
-            scanGamesFolder(gamesFolderUri);
-        }
-        applySavedBackground();
-    } catch (Throwable ignored) {}
+        try {
+            SharedPreferences sp = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            String saved = sp.getString(PREF_GAMES_URI, null);
+            if (saved != null) {
+                gamesFolderUri = Uri.parse(saved);
+                scanGamesFolder(gamesFolderUri);
+            }
+            applySavedBackground();
+        } catch (Throwable ignored) { }
 
-    try {
-        if (getIntent() != null && getIntent().getBooleanExtra("BOOT_BIOS", false)) {
-            bootBios();
-        }
-    } catch (Throwable ignored) {}
+        try {
+            if (getIntent() != null && getIntent().getBooleanExtra("BOOT_BIOS", false)) {
+                bootBios();
+            }
+        } catch (Throwable ignored) { }
     }
     private void toggleSearchBar() {
         if (etSearch == null) return;
@@ -521,19 +529,19 @@ public class MainActivity extends AppCompatActivity {
             try {
                 android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm != null) imm.showSoftInput(etSearch, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
         } else {
             try {
                 android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm != null) imm.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
             etSearch.clearFocus();
         }
     }
 
     // region Covers
     private static final String PREF_COVERS_URL = "covers_url_template";
-    private static final String PREF_MANUAL_COVER_PREFIX = "manual_cover:"; 
+    private static final String PREF_MANUAL_COVER_PREFIX = "manual_cover:";
     private String getCoversUrlTemplate() {
         return getSharedPreferences(PREFS, MODE_PRIVATE).getString(PREF_COVERS_URL, "");
     }
@@ -541,19 +549,23 @@ public class MainActivity extends AppCompatActivity {
         getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(PREF_COVERS_URL, s == null ? "" : s).apply();
     }
     private String getManualCoverUri(String gameKey) {
-        try { return getSharedPreferences(PREFS, MODE_PRIVATE).getString(PREF_MANUAL_COVER_PREFIX + gameKey, null); } catch (Throwable ignored) { return null; }
+        try {
+            return getSharedPreferences(PREFS, MODE_PRIVATE).getString(PREF_MANUAL_COVER_PREFIX + gameKey, null);
+        } catch (Throwable ignored) {
+        	return null;
+        }
     }
     private void setManualCoverUri(String gameKey, String uri) {
         try {
             getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(PREF_MANUAL_COVER_PREFIX + gameKey, uri).apply();
             GamesAdapter.clearLocalCoverCache();
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
     }
     private void removeManualCoverUri(String gameKey) {
         try {
             getSharedPreferences(PREFS, MODE_PRIVATE).edit().remove(PREF_MANUAL_COVER_PREFIX + gameKey).apply();
             GamesAdapter.clearLocalCoverCache();
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
     }
     private void promptForCoversUrl() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_cover_template, null);
@@ -579,7 +591,9 @@ public class MainActivity extends AppCompatActivity {
                     value = input.getText().toString().trim();
                 }
                 setCoversUrlTemplate(value);
-                try { Toast.makeText(this, R.string.cover_template_saved_toast, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+                try {
+                    Toast.makeText(this, R.string.cover_template_saved_toast, Toast.LENGTH_SHORT).show();
+                } catch (Throwable ignored) { }
                 if (gamesFolderUri != null) {
                     scanGamesFolder(gamesFolderUri);
                 }
@@ -603,25 +617,35 @@ public class MainActivity extends AppCompatActivity {
         GamesAdapter.clearLocalCoverCache();
         File cacheDir = getCoversCacheDir();
         if (cacheDir == null) {
-            try { Toast.makeText(this, R.string.cover_prefetch_none, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+            try {
+                Toast.makeText(this, R.string.cover_prefetch_none, Toast.LENGTH_SHORT).show();
+            } catch (Throwable ignored) { }
             return;
         }
         if (roots.isEmpty()) {
-            try { Toast.makeText(this, R.string.cover_prefetch_none, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+            try {
+                Toast.makeText(this, R.string.cover_prefetch_none, Toast.LENGTH_SHORT).show();
+            } catch (Throwable ignored) { }
             return;
         }
         if (!hasInternetConnection()) {
-            try { Toast.makeText(this, R.string.cover_prefetch_no_connection, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+            try {
+                Toast.makeText(this, R.string.cover_prefetch_no_connection, Toast.LENGTH_SHORT).show();
+            } catch (Throwable ignored) { }
             return;
         }
         synchronized (coverPrefetchLock) {
             if (coverPrefetchRunning) {
-                try { Toast.makeText(this, R.string.cover_prefetch_running, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+                try {
+                    Toast.makeText(this, R.string.cover_prefetch_running, Toast.LENGTH_SHORT).show();
+                } catch (Throwable ignored) { }
                 return;
             }
             coverPrefetchRunning = true;
         }
-        try { Toast.makeText(this, R.string.cover_prefetch_start, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+        try {
+            Toast.makeText(this, R.string.cover_prefetch_start, Toast.LENGTH_SHORT).show();
+        } catch (Throwable ignored) { }
             new Thread(() -> {
                 int downloaded = 0;
                 try {
@@ -641,7 +665,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(this, R.string.cover_prefetch_none, Toast.LENGTH_SHORT).show();
                     }
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) { }
             });
         }, "CoverPrefetch").start();
     }
@@ -692,7 +716,7 @@ public class MainActivity extends AppCompatActivity {
                         ge.gameTitle = rd.name;
                     }
                 }
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
         }
     }
 
@@ -763,7 +787,7 @@ public class MainActivity extends AppCompatActivity {
             if (m.find()) {
                 return (m.group(1).toUpperCase(Locale.US) + "-" + m.group(2));
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { }
         return s;
     }
 
@@ -779,7 +803,7 @@ public class MainActivity extends AppCompatActivity {
             b3 = b3.replace(" - ", ": ");
             b3 = b3.replaceAll("\\s+", " ").trim();
             if (!b3.isEmpty()) set.add(b3);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
         return new ArrayList<>(set);
     }
 
@@ -903,10 +927,14 @@ public class MainActivity extends AppCompatActivity {
             return false;
         } finally {
             if (in != null) {
-                try { in.close(); } catch (IOException ignored) {}
+                try {
+                    in.close();
+                } catch (IOException ignored) { }
             }
             if (out != null) {
-                try { out.close(); } catch (IOException ignored) {}
+                try {
+                    out.close();
+                } catch (IOException ignored) { }
             }
             if (connection != null) {
                 connection.disconnect();
@@ -939,7 +967,9 @@ public class MainActivity extends AppCompatActivity {
                 if (stored != null && stored.isFile()) {
                     GamesAdapter.registerCachedCover(entry, stored);
                 }
-                try { DebugLog.d("Covers", "Cached cover for " + baseName + " from " + url); } catch (Throwable ignored) {}
+                try {
+                    DebugLog.d("Covers", "Cached cover for " + baseName + " from " + url);
+                } catch (Throwable ignored) { }
                 return true;
             }
         }
@@ -951,16 +981,20 @@ public class MainActivity extends AppCompatActivity {
         if (gamesFolderUri != null) {
             roots.add(gamesFolderUri);
         }
-        android.content.SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         String savedPrimary = prefs.getString(PREF_GAMES_URI, null);
         if (gamesFolderUri == null && !TextUtils.isEmpty(savedPrimary)) {
-            try { roots.add(Uri.parse(savedPrimary)); } catch (Exception ignored) {}
+            try {
+                roots.add(Uri.parse(savedPrimary));
+            } catch (Exception ignored) { }
         }
         java.util.Set<String> secondary = prefs.getStringSet("secondary_game_dirs", null);
         if (secondary != null) {
             for (String uriString : secondary) {
                 if (TextUtils.isEmpty(uriString)) continue;
-                try { roots.add(Uri.parse(uriString)); } catch (Exception ignored) {}
+                try {
+                    roots.add(Uri.parse(uriString));
+                } catch (Exception ignored) { }
             }
         }
         return roots;
@@ -1102,10 +1136,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (existing != null) {
-            MaterialButton remove = new MaterialButton(this);
-            remove.setText("Remove chosen cover");
             int surfaceVariant = resolveThemeColor(android.R.attr.colorBackground);
             int onSurface = resolveThemeColor(android.R.attr.textColorPrimary);
+            MaterialButton remove = new MaterialButton(this);
+            remove.setText("Remove chosen cover");
             remove.setBackgroundTintList(ColorStateList.valueOf(surfaceVariant));
             remove.setTextColor(onSurface);
             container.addView(remove);
@@ -1120,8 +1154,6 @@ public class MainActivity extends AppCompatActivity {
     }
     // endregion Manual cover selection
 
-    
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -1130,7 +1162,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 GameManager gm = (GameManager) getSystemService(Context.GAME_SERVICE);
                 if (gm != null) gm.setGameState(new GameState(false, GameState.MODE_GAMEPLAY_INTERRUPTIBLE));
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
         }
     }
 
@@ -1166,21 +1198,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void ensureBiosPresent() {
-    if (!hasBios()) {
-        Toast.makeText(this, "ARMSX2 no bios found!", Toast.LENGTH_LONG).show();
-        new MaterialAlertDialogBuilder(this)
-            .setMessage("No PS2 BIOS found. Please choose a BIOS file.")
-            .setCancelable(true)
-            .setNegativeButton("Close", (d, w) -> d.dismiss())
-            .setPositiveButton("Choose BIOS", (d, w) -> openBiosPicker())
-            .show();
+        if (!hasBios()) {
+            Toast.makeText(this, "ARMSX2 no bios found!", Toast.LENGTH_LONG).show();
+            new MaterialAlertDialogBuilder(this)
+                .setMessage("No PS2 BIOS found. Please choose a BIOS file.")
+                .setCancelable(true)
+                .setNegativeButton("Close", (d, w) -> d.dismiss())
+                .setPositiveButton("Choose BIOS", (d, w) -> openBiosPicker())
+                .show();
         } else {
             // BIOS is present, signal we’re gameplay-ready.
             if (Build.VERSION.SDK_INT >= 33) {
                 try {
                     GameManager gm = (GameManager) getSystemService(Context.GAME_SERVICE);
                     if (gm != null) gm.setGameState(new GameState(false, GameState.MODE_GAMEPLAY_INTERRUPTIBLE));
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) { }
             }
         }
     }
@@ -1246,7 +1278,7 @@ public class MainActivity extends AppCompatActivity {
                     if (idx >= 0 && idx + 1 < p.length()) name = p.substring(idx + 1);
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
         if (!name.toLowerCase().endsWith(".bin")) name = name + ".bin";
 
         // Avoid overwrite
@@ -1257,7 +1289,10 @@ public class MainActivity extends AppCompatActivity {
             String stem = baseName;
             String ext = "";
             int dot = baseName.lastIndexOf('.');
-            if (dot > 0) { stem = baseName.substring(0, dot); ext = baseName.substring(dot); }
+            if (dot > 0) {
+                stem = baseName.substring(0, dot);
+                ext = baseName.substring(dot);
+            }
             outFile = new File(biosDir, stem + " (" + suffix + ")" + ext);
             suffix++;
         }
@@ -1297,7 +1332,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
 
         MaterialAlertDialogBuilder b = new MaterialAlertDialogBuilder(this)
                 .setTitle("BIOS Selection")
@@ -1306,7 +1341,7 @@ public class MainActivity extends AppCompatActivity {
                         String path = biosList.get(which).getAbsolutePath();
                         NativeApp.setSetting("Filenames", "BIOS", "string", path);
                         Toast.makeText(this, "Current BIOS: " + biosList.get(which).getName(), Toast.LENGTH_SHORT).show();
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) { }
                 })
                 .setNegativeButton("Close", (d, w) -> d.dismiss())
                 .setPositiveButton("Import", (d, w) -> openBiosImportForManager());
@@ -1356,7 +1391,7 @@ public class MainActivity extends AppCompatActivity {
         if (inGameDrawer != null) {
             try {
                 inGameDrawer.setDrawerElevation(0f);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
             inGameDrawer.setDrawerLockMode(disableTouchControls ? DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED);
             inGameDrawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
                 @Override
@@ -1367,7 +1402,7 @@ public class MainActivity extends AppCompatActivity {
                     hideDrawerToggle();
                     try {
                         getWindow().getDecorView().removeCallbacks(hideRunnable);
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) { }
                     updateWidescreenToggleVisibility();
                 }
 
@@ -1539,7 +1574,7 @@ public class MainActivity extends AppCompatActivity {
         isFastForwardEnabled = enabled;
         try {
             NativeApp.speedhackLimitermode(enabled ? 3 : 0);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
         updateFastForwardButtonState();
     }
 
@@ -1780,7 +1815,7 @@ public class MainActivity extends AppCompatActivity {
         }
         try {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
     }
 
     private void setupRendererToggleGroup() {
@@ -1795,7 +1830,7 @@ public class MainActivity extends AppCompatActivity {
             if (renderer != null && !renderer.isEmpty()) {
                 initialValue = Integer.parseInt(renderer);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { }
 
         int initialButton = rendererButtonForValue(initialValue);
         rendererGroup.check(initialButton);
@@ -1826,14 +1861,15 @@ public class MainActivity extends AppCompatActivity {
 						}
 					}
 				}
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) { }
 			if (current < 0 || current >= aspectAdapter.getCount()) current = 0;
 			aspectSpinner.setSelection(current, false);
 			aspectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 				@Override
 				public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-					if (position < 0 || position >= aspectChoices.length)
+					if (position < 0 || position >= aspectChoices.length) {
 						return;
+					}
 					String value = aspectChoices[position];
 					NativeApp.setSetting("EmuCore/GS", "AspectRatio", "string", value);
 					NativeApp.setAspectRatio(position);
@@ -1857,7 +1893,7 @@ public class MainActivity extends AppCompatActivity {
                     float parsed = Float.parseFloat(value);
                     current = Math.max(1, Math.min(scaleAdapter.getCount(), Math.round(parsed))) - 1;
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) { }
             if (current < 0 || current >= scaleAdapter.getCount()) current = 0;
             scaleSpinner.setSelection(current, false);
             scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -1883,7 +1919,7 @@ public class MainActivity extends AppCompatActivity {
                 if (value != null && !value.isEmpty()) {
                     current = Integer.parseInt(value);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) { }
             if (current < 0 || current >= blendAdapter.getCount()) current = 0;
             blendSpinner.setSelection(current, false);
             blendSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -1906,11 +1942,11 @@ public class MainActivity extends AppCompatActivity {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, modes);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             modeSpinner.setAdapter(adapter);
-            
+
             // Load saved mode (default is 0 = 2 Sticks)
             int savedMode = getSharedPreferences(PREFS, MODE_PRIVATE).getInt("controller_mode", 0);
             modeSpinner.setSelection(savedMode, false);
-            
+
             modeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -1922,104 +1958,104 @@ public class MainActivity extends AppCompatActivity {
                 public void onNothingSelected(AdapterView<?> parent) {
                 }
             });
-            
+
             applyControllerMode(savedMode);
         }
     }
 
     private void applyControllerMode(int mode) {
         currentControllerMode = mode;
-        
+
         JoystickView joystickLeft = findViewById(R.id.joystick_left);
         JoystickView joystickRight = findViewById(R.id.joystick_right);
         DPadView dpadView = findViewById(R.id.dpad_view);
         View llPadRight = findViewById(R.id.ll_pad_right);
-        
+
         if (joystickLeft == null || joystickRight == null || dpadView == null || llPadRight == null) {
             return;
         }
-        
+
         switch (mode) {
             case 0: // 2 Sticks 
                 joystickLeft.setVisibility(View.VISIBLE);
                 joystickRight.setVisibility(View.VISIBLE);
                 dpadView.setVisibility(View.VISIBLE);
                 llPadRight.setVisibility(View.VISIBLE);
-                
+
                 ViewGroup.LayoutParams leftParams = joystickLeft.getLayoutParams();
                 leftParams.width = dpToPx(140);
                 leftParams.height = dpToPx(140);
                 joystickLeft.setLayoutParams(leftParams);
-                
+
                 ViewGroup.LayoutParams rightParams = joystickRight.getLayoutParams();
                 rightParams.width = dpToPx(140);
                 rightParams.height = dpToPx(140);
                 joystickRight.setLayoutParams(rightParams);
-                
+
                 ViewGroup.LayoutParams dpadParams = dpadView.getLayoutParams();
                 dpadParams.width = dpToPx(105);
                 dpadParams.height = dpToPx(105);
                 dpadView.setLayoutParams(dpadParams);
-                
+
                 llPadRight.setScaleX(1.0f);
                 llPadRight.setScaleY(1.0f);
                 if (llPadRight.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
                     ViewGroup.MarginLayoutParams faceParams = (ViewGroup.MarginLayoutParams) llPadRight.getLayoutParams();
-                    faceParams.bottomMargin = dpToPx(1); 
+                    faceParams.bottomMargin = dpToPx(1);
                     llPadRight.setLayoutParams(faceParams);
                 }
                 faceButtonsBaseScale = 1.0f;
                 break;
-                
-            case 1: // 1 Stick + Face Buttons 
+
+            case 1: // 1 Stick + Face Buttons
                 joystickLeft.setVisibility(View.VISIBLE);
-                joystickRight.setVisibility(View.GONE); 
-                dpadView.setVisibility(View.GONE); 
+                joystickRight.setVisibility(View.GONE);
+                dpadView.setVisibility(View.GONE);
                 llPadRight.setVisibility(View.VISIBLE);
-                
+
                 ViewGroup.LayoutParams leftParams1 = joystickLeft.getLayoutParams();
                 leftParams1.width = dpToPx(140);
                 leftParams1.height = dpToPx(140);
                 joystickLeft.setLayoutParams(leftParams1);
-                
+
                 ViewGroup.LayoutParams dpadParams1 = dpadView.getLayoutParams();
                 dpadParams1.width = dpToPx(105);
                 dpadParams1.height = dpToPx(105);
                 dpadView.setLayoutParams(dpadParams1);
-                
+
                 llPadRight.setScaleX(1.4f);
                 llPadRight.setScaleY(1.4f);
-                
+
                 if (llPadRight.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
                     ViewGroup.MarginLayoutParams faceParams1 = (ViewGroup.MarginLayoutParams) llPadRight.getLayoutParams();
-                    faceParams1.bottomMargin = dpToPx(6) + dpToPx(11); 
+                    faceParams1.bottomMargin = dpToPx(6) + dpToPx(11);
                     llPadRight.setLayoutParams(faceParams1);
                 }
                 faceButtonsBaseScale = 1.4f;
                 break;
-                
+
             case 2: // D-Pad Only 
                 joystickLeft.setVisibility(View.GONE);
                 joystickRight.setVisibility(View.GONE);
                 dpadView.setVisibility(View.VISIBLE);
                 llPadRight.setVisibility(View.VISIBLE);
-                
+
                 ViewGroup.LayoutParams dpadParams2 = dpadView.getLayoutParams();
                 dpadParams2.width = dpToPx(140);
                 dpadParams2.height = dpToPx(140);
                 dpadView.setLayoutParams(dpadParams2);
-                
+
                 ViewGroup.LayoutParams rightParams2 = joystickRight.getLayoutParams();
                 rightParams2.width = dpToPx(140);
                 rightParams2.height = dpToPx(140);
                 joystickRight.setLayoutParams(rightParams2);
-                
+
                 llPadRight.setScaleX(1.4f);
                 llPadRight.setScaleY(1.4f);
-                
+
                 if (llPadRight.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
                     ViewGroup.MarginLayoutParams faceParams2 = (ViewGroup.MarginLayoutParams) llPadRight.getLayoutParams();
-                    faceParams2.bottomMargin = dpToPx(6) + dpToPx(11); 
+                    faceParams2.bottomMargin = dpToPx(6) + dpToPx(11);
                     llPadRight.setLayoutParams(faceParams2);
                 }
                 faceButtonsBaseScale = 1.4f;
@@ -2035,12 +2071,11 @@ public class MainActivity extends AppCompatActivity {
         MaterialSwitch swEnableCheats = findViewById(R.id.drawer_sw_enable_cheats);
         if (swEnableCheats != null) {
             swEnableCheats.setChecked(readBoolSetting("EmuCore", "EnableCheats", false));
-            swEnableCheats.setOnCheckedChangeListener((buttonView, isChecked) ->
-            {
-                    NativeApp.setEnableCheats(isChecked);
-                    try {
-                        DebugLog.d("Cheats", "EnableCheats=" + isChecked);
-                    } catch (Throwable ignored) {}
+            swEnableCheats.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                NativeApp.setEnableCheats(isChecked);
+                try {
+                    DebugLog.d("Cheats", "EnableCheats=" + isChecked);
+                } catch (Throwable ignored) { }
             });
         }
 
@@ -2061,7 +2096,7 @@ public class MainActivity extends AppCompatActivity {
                 NativeApp.setSetting("EmuCore/GS", "LoadTextureReplacements", "bool", isChecked ? "true" : "false");
                 try {
                     DebugLog.d("Textures", "LoadTextureReplacements=" + isChecked);
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) { }
             });
         }
 
@@ -2072,7 +2107,7 @@ public class MainActivity extends AppCompatActivity {
                 NativeApp.setSetting("EmuCore/GS", "LoadTextureReplacementsAsync", "bool", isChecked ? "true" : "false");
                 try {
                     DebugLog.d("Textures", "LoadTextureReplacementsAsync=" + isChecked);
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) { }
             });
         }
 
@@ -2083,7 +2118,7 @@ public class MainActivity extends AppCompatActivity {
                 NativeApp.setSetting("EmuCore/GS", "PrecacheTextureReplacements", "bool", isChecked ? "true" : "false");
                 try {
                     DebugLog.d("Textures", "PrecacheTextureReplacements=" + isChecked);
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) { }
             });
         }
 
@@ -2102,7 +2137,7 @@ public class MainActivity extends AppCompatActivity {
         boolean hasPatch = false;
         try {
             hasPatch = NativeApp.hasWidescreenPatch();
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
         if (!hasPatch) {
             drawerWidescreenSwitch.setVisibility(View.GONE);
             drawerWidescreenSwitch.setOnCheckedChangeListener(null);
@@ -2157,26 +2192,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showGameStateDialog() {
-        CharSequence[] items = new CharSequence[]{
+        CharSequence[] items = new CharSequence[] {
                 "Save state (slot 1)",
                 "Load state (slot 1)"
         };
-    new MaterialAlertDialogBuilder(this)
-        .setTitle("Game State")
+        new MaterialAlertDialogBuilder(this)
+            .setTitle("Game State")
                 .setItems(items, (dialog, which) -> {
                     if (which == 0) {
                         pauseVmForStateOperation();
                         boolean ok = NativeApp.saveStateToSlot(1);
                         try {
                             Toast.makeText(this, ok ? "State saved" : "Failed to save state", Toast.LENGTH_SHORT).show();
-                        } catch (Throwable ignored) {}
+                        } catch (Throwable ignored) { }
                         resumeVmAfterStateOperation();
                     } else if (which == 1) {
                         pauseVmForStateOperation();
                         boolean ok = NativeApp.loadStateFromSlot(1);
                         try {
                             Toast.makeText(this, ok ? "State loaded" : "Failed to load state", Toast.LENGTH_SHORT).show();
-                        } catch (Throwable ignored) {}
+                        } catch (Throwable ignored) { }
                         if (!ok) {
                             resumeVmAfterStateOperation();
                             return;
@@ -2192,26 +2227,26 @@ public class MainActivity extends AppCompatActivity {
         String versionName = "";
         try {
             versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        } catch (Exception ignored) {}
-    String message = "ARMSX2 (" + versionName + ")\n" +
-        "by ARMSX2 team\n\n" +
-        "Core contributors:\n" +
-        "- MoonPower — App developer\n" +
-        "- jpolo — Management\n" +
-        "- Medieval Shell — Web developer\n" +
-        "- set l — Web developer\n" +
-        "- Alex — QA tester\n" +
-        "- Yua — QA tester\n\n" +
-        "Thanks to:\n" +
-        "- pontos2024 (emulator base)\n" +
-        "- PCSX2 v2.3.430 (core emulator)\n" +
-        "- SDL (SDL3)\n" +
-        "- Fffathur (icon design)";
-    new MaterialAlertDialogBuilder(this)
-        .setTitle("About")
-        .setMessage(message)
-        .setPositiveButton(android.R.string.ok, (d, w) -> d.dismiss())
-        .show();
+        } catch (Exception ignored) { }
+        String message = "ARMSX2 (" + versionName + ")\n" +
+            "by ARMSX2 team\n\n" +
+            "Core contributors:\n" +
+            "- MoonPower — App developer\n" +
+            "- jpolo — Management\n" +
+            "- Medieval Shell — Web developer\n" +
+            "- set l — Web developer\n" +
+            "- Alex — QA tester\n" +
+            "- Yua — QA tester\n\n" +
+            "Thanks to:\n" +
+            "- pontos2024 (emulator base)\n" +
+            "- PCSX2 v2.3.430 (core emulator)\n" +
+            "- SDL (SDL3)\n" +
+            "- Fffathur (icon design)";
+        new MaterialAlertDialogBuilder(this)
+            .setTitle("About")
+            .setMessage(message)
+            .setPositiveButton(android.R.string.ok, (d, w) -> d.dismiss())
+            .show();
     }
 
     private String resolveOnScreenUiStylePreference() {
@@ -2238,7 +2273,9 @@ public class MainActivity extends AppCompatActivity {
             }
             return drawable;
         } catch (IOException e) {
-            try { DebugLog.e("OnScreenUI", "Failed to load Nether icon " + assetName + ": " + e.getMessage()); } catch (Throwable ignored) {}
+            try {
+                DebugLog.e("OnScreenUI", "Failed to load Nether icon " + assetName + ": " + e.getMessage());
+            } catch (Throwable ignored) { }
             return null;
         }
     }
@@ -2309,7 +2346,7 @@ public class MainActivity extends AppCompatActivity {
         float value = 1.0f;
         try {
             value = getSharedPreferences(PREFS, MODE_PRIVATE).getFloat(PREF_UI_SCALE_MULTIPLIER, 1.0f);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { }
         if (value < ONSCREEN_UI_SCALE_MIN) value = ONSCREEN_UI_SCALE_MIN;
         if (value > ONSCREEN_UI_SCALE_MAX) value = ONSCREEN_UI_SCALE_MAX;
         onScreenUiScaleMultiplier = value;
@@ -2362,7 +2399,7 @@ public class MainActivity extends AppCompatActivity {
             NativeApp.pause();
             SystemClock.sleep(50);
             NativeApp.resetKeyStatus();
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
     }
 
     private void resumeVmAfterStateOperation() {
@@ -2371,7 +2408,7 @@ public class MainActivity extends AppCompatActivity {
             NativeApp.resume();
             isVmPaused = false;
             updatePauseButtonIcon();
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
     }
 
     private void updateOnScreenUiScaleLabel(TextView label) {
@@ -2384,7 +2421,7 @@ public class MainActivity extends AppCompatActivity {
         float stored = 1.0f;
         try {
             stored = getSharedPreferences(PREFS, MODE_PRIVATE).getFloat(PREF_UI_SCALE_MULTIPLIER, 1.0f);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { }
         if (stored < ONSCREEN_UI_SCALE_MIN) stored = ONSCREEN_UI_SCALE_MIN;
         if (stored > ONSCREEN_UI_SCALE_MAX) stored = ONSCREEN_UI_SCALE_MAX;
         if (Math.abs(stored - onScreenUiScaleMultiplier) > 0.001f) {
@@ -2584,7 +2621,9 @@ public class MainActivity extends AppCompatActivity {
                 if (in == null) return false;
                 byte[] buf = new byte[8192];
                 int n;
-                while ((n = in.read(buf)) > 0) os.write(buf, 0, n);
+                while ((n = in.read(buf)) > 0) {
+                    os.write(buf, 0, n);
+                }
                 os.flush();
             }
             return true;
@@ -2608,7 +2647,9 @@ public class MainActivity extends AppCompatActivity {
                 File cheatsDir = new File(dataRoot, "cheats");
                 if (!cheatsDir.exists() && !cheatsDir.mkdirs()) {
                     errorReason = "Unable to create cheats directory: " + cheatsDir;
-                    try { DebugLog.e("Cheats", errorReason); } catch (Throwable ignored) {}
+                    try {
+                        DebugLog.e("Cheats", errorReason);
+                    } catch (Throwable ignored) { }
                 } else {
                     String displayName = getDisplayNameForUri(uri);
                     if (TextUtils.isEmpty(displayName)) {
@@ -2636,7 +2677,9 @@ public class MainActivity extends AppCompatActivity {
                         if (errorReason == null || errorReason.trim().isEmpty()) {
                             errorReason = e.getClass().getSimpleName();
                         }
-                        try { DebugLog.e("Cheats", "Import failed: " + errorReason); } catch (Throwable ignored) {}
+                        try {
+                            DebugLog.e("Cheats", "Import failed: " + errorReason);
+                        } catch (Throwable ignored) { }
                     }
                 }
             }
@@ -2653,7 +2696,7 @@ public class MainActivity extends AppCompatActivity {
                 if (finalSuccess) {
                     try {
                         NativeApp.setEnableCheats(true);
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) { }
                 } else {
                     showDrawerImportFailureDialog(R.string.drawer_error_import_cheats_title, finalError);
                 }
@@ -2675,7 +2718,9 @@ public class MainActivity extends AppCompatActivity {
                 File texturesDir = new File(dataRoot, "textures");
                 if (!texturesDir.exists() && !texturesDir.mkdirs()) {
                     errorReason = "Unable to create textures directory: " + texturesDir;
-                    try { DebugLog.e("Textures", errorReason); } catch (Throwable ignored) {}
+                    try {
+                        DebugLog.e("Textures", errorReason);
+                    } catch (Throwable ignored) { }
                 } else {
                     try (InputStream inputStream = getContentResolver().openInputStream(uri)) {
                         if (inputStream == null) {
@@ -2716,7 +2761,9 @@ public class MainActivity extends AppCompatActivity {
                         if (errorReason == null || errorReason.trim().isEmpty()) {
                             errorReason = e.getClass().getSimpleName();
                         }
-                        try { DebugLog.e("Textures", "Import failed: " + errorReason); } catch (Throwable ignored) {}
+                        try {
+                            DebugLog.e("Textures", "Import failed: " + errorReason);
+                        } catch (Throwable ignored) { }
                     }
                 }
             }
@@ -2733,7 +2780,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         NativeApp.setSetting("EmuCore/GS", "LoadTextureReplacements", "bool", "true");
                         NativeApp.setSetting("EmuCore/GS", "LoadTextureReplacementsAsync", "bool", "true");
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) { }
                 } else {
                     showDrawerImportFailureDialog(R.string.drawer_error_import_textures_title, finalError);
                 }
@@ -2752,7 +2799,7 @@ public class MainActivity extends AppCompatActivity {
                     return cursor.getString(index);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { }
         return null;
     }
 
@@ -2792,7 +2839,7 @@ public class MainActivity extends AppCompatActivity {
         }
         try {
             getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        } catch (SecurityException ignored) {}
+        } catch (SecurityException ignored) { }
     }
 
     private void showDrawerImportFailureDialog(@StringRes int titleRes, String details) {
@@ -2819,7 +2866,9 @@ public class MainActivity extends AppCompatActivity {
                 .create();
 
         View btnClose = view.findViewById(R.id.btn_close);
-        if (btnClose != null) btnClose.setOnClickListener(v -> dialog.dismiss());
+        if (btnClose != null) {
+            btnClose.setOnClickListener(v -> dialog.dismiss());
+        }
 
         // Aspect ratio options
         View rg = view.findViewById(R.id.rg_aspect);
@@ -2865,32 +2914,34 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-    View btnAbout = view.findViewById(R.id.btn_about);
-    if (btnAbout != null) {
-        btnAbout.setOnClickListener(v -> {
-        String versionName = "";
-        try { versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName; } catch (Exception ignored) {}
-        String message = "ARMSX2 (" + versionName + ")\n" +
-            "by ARMSX2 team\n\n" +
-            "Core contributors:\n" +
-            "- MoonPower — App developer\n" +
-            "- jpolo — Management\n" +
-            "- Medieval Shell — Web developer\n" +
-            "- set l — Web developer\n" +
-            "- Alex — QA tester\n" +
-            "- Yua — QA tester\n\n" +
-            "Thanks to:\n" +
-            "- pontos2024 (emulator base)\n" +
-            "- PCSX2 v2.3.430 (core emulator)\n" +
-            "- SDL (SDL3)\n" +
-            "- Fffathur (icon design)";
-        new MaterialAlertDialogBuilder(this)
-            .setTitle("About")
-            .setMessage(message)
-            .setPositiveButton("OK", (d, w) -> d.dismiss())
-            .show();
-        });
-    }
+        View btnAbout = view.findViewById(R.id.btn_about);
+        if (btnAbout != null) {
+            btnAbout.setOnClickListener(v -> {
+                String versionName = "";
+                try {
+                    versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+                } catch (Exception ignored) { }
+                String message = "ARMSX2 (" + versionName + ")\n" +
+                    "by ARMSX2 team\n\n" +
+                    "Core contributors:\n" +
+                    "- MoonPower — App developer\n" +
+                    "- jpolo — Management\n" +
+                    "- Medieval Shell — Web developer\n" +
+                    "- set l — Web developer\n" +
+                    "- Alex — QA tester\n" +
+                    "- Yua — QA tester\n\n" +
+                    "Thanks to:\n" +
+                    "- pontos2024 (emulator base)\n" +
+                    "- PCSX2 v2.3.430 (core emulator)\n" +
+                    "- SDL (SDL3)\n" +
+                    "- Fffathur (icon design)";
+                    new MaterialAlertDialogBuilder(this)
+                        .setTitle("About")
+                        .setMessage(message)
+                        .setPositiveButton("OK", (d, w) -> d.dismiss())
+                        .show();
+            });
+        }
 
         dialog.show();
     }
@@ -2901,16 +2952,16 @@ public class MainActivity extends AppCompatActivity {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     try {
                         Intent _intent = result.getData();
-                        if(_intent != null) {
+                        if (_intent != null) {
                             Uri picked = _intent.getData();
                             if (picked != null) {
                                 m_szGamefile = picked.toString();
-                                if(!TextUtils.isEmpty(m_szGamefile)) {
+                                if (!TextUtils.isEmpty(m_szGamefile)) {
                                     handleSelectedGameUri(picked);
                                 }
                             }
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) { }
                 }
             });
 
@@ -2927,7 +2978,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if (requestCode == 9911 && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
             Uri uri = data.getData();
-            try { getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION); } catch (Exception ignored) {}
+            try {
+                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } catch (Exception ignored) { }
             if (importMemcardToSlot1(uri)) {
                 NativeApp.setSetting("MemoryCards", "Slot1_Enable", "bool", "false");
                 NativeApp.setSetting("MemoryCards", "Slot1_Filename", "string", "Mcd001.ps2");
@@ -2950,7 +3003,9 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null && result.getData().getData() != null) {
                     Uri uri = result.getData().getData();
-                    try { getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION); } catch (Exception ignored) {}
+                    try {
+                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } catch (Exception ignored) { }
                     importBiosFromUri(uri);
                     showBiosManagerDialog();
                 }
@@ -3033,7 +3088,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             String current = NativeApp.getSetting("Logging", "RecordAndroidLog", "bool");
             recordLogs = "true".equalsIgnoreCase(current);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { }
         LogcatRecorder.setEnabled(recordLogs);
 
 		// Set up JNI
@@ -3117,7 +3172,7 @@ public class MainActivity extends AppCompatActivity {
         if (resolvedPath == null || resolvedPath.trim().isEmpty()) {
             try {
                 Toast.makeText(this, "Unable to use selected folder", Toast.LENGTH_LONG).show();
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
             storagePromptShown = false;
             maybeShowDataDirectoryPrompt();
             return;
@@ -3126,7 +3181,7 @@ public class MainActivity extends AppCompatActivity {
         if (!targetDir.exists() && !targetDir.mkdirs()) {
             try {
                 Toast.makeText(this, "Cannot create folders in the selected location", Toast.LENGTH_LONG).show();
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
             storagePromptShown = false;
             maybeShowDataDirectoryPrompt();
             return;
@@ -3145,7 +3200,7 @@ public class MainActivity extends AppCompatActivity {
             storagePromptShown = true;
             try {
                 Toast.makeText(this, "Already using that folder", Toast.LENGTH_SHORT).show();
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
             return;
         }
         beginDataDirectoryMigration(currentDir, targetDir, tree.toString());
@@ -3171,11 +3226,11 @@ public class MainActivity extends AppCompatActivity {
                     storagePromptShown = true;
                     try {
                         Toast.makeText(this, "Data location updated", Toast.LENGTH_LONG).show();
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) { }
                 } else {
                     try {
                         Toast.makeText(this, "Failed to move data", Toast.LENGTH_LONG).show();
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) { }
                     storagePromptShown = false;
                     maybeShowDataDirectoryPrompt();
                 }
@@ -3239,7 +3294,9 @@ public class MainActivity extends AppCompatActivity {
                 DebugLog.w("VM", "VM still reporting active after shutdown; proceeding with clean boot");
             }
         }
-        try { NativeApp.resetKeyStatus(); } catch (Throwable ignored) {}
+        try {
+            NativeApp.resetKeyStatus();
+        } catch (Throwable ignored) { }
         if (isThread()) {
             return;
         }
@@ -3247,13 +3304,15 @@ public class MainActivity extends AppCompatActivity {
         updatePauseButtonIcon();
         mEmulationThread = new Thread(() -> {
             runOnUiThread(() -> {
-                try { if (NativeApp.isFullscreenUIEnabled()) setOnScreenControlsVisible(true); } catch (Throwable ignored) {}
+                try {
+                    if (NativeApp.isFullscreenUIEnabled()) setOnScreenControlsVisible(true);
+                } catch (Throwable ignored) { }
                 try {
                     String p = m_szGamefile;
                     if (p != null && !p.isEmpty()) {
                         Toast.makeText(this, "Launching: " + p, Toast.LENGTH_SHORT).show();
                     }
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) { }
             });
             NativeApp.runVMThread(m_szGamefile);
         });
@@ -3276,7 +3335,9 @@ public class MainActivity extends AppCompatActivity {
         } else if (forceShutdown) {
             NativeApp.shutdown();
         }
-        try { NativeApp.resetKeyStatus(); } catch (Throwable ignored) {}
+        try {
+            NativeApp.resetKeyStatus();
+        } catch (Throwable ignored) { }
         setFastForwardEnabled(false);
         isVmPaused = false;
         updatePauseButtonIcon();
@@ -3292,9 +3353,11 @@ public class MainActivity extends AppCompatActivity {
         String scheme = uri.getScheme();
         String lastSeg = uri.getLastPathSegment();
         String mime = null;
-        try { mime = getContentResolver().getType(uri); } catch (Exception ignored) {}
-        boolean hasChdSuffix = (lastSeg != null && lastSeg.toLowerCase().endsWith(".chd")) ||
-                (m_szGamefile.toLowerCase().endsWith(".chd"));
+        try {
+            mime = getContentResolver().getType(uri);
+        } catch (Exception ignored) { }
+        boolean hasChdSuffix = (lastSeg != null && lastSeg.toLowerCase().endsWith(".chd"))
+                || (m_szGamefile.toLowerCase().endsWith(".chd"));
 
         boolean headerSaysChd = false;
         byte[] header = readFirstBytes(uri, 16);
@@ -3304,16 +3367,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if ("content".equals(scheme)) {
-            try { getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION); } catch (Throwable ignored) {}
+            try {
+                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } catch (Throwable ignored) { }
             m_szGamefile = uri.toString();
-            try { lastInput = InputSource.TOUCH; lastTouchTimeMs = System.currentTimeMillis(); setOnScreenControlsVisible(true); } catch (Throwable ignored) {}
+            try {
+                lastInput = InputSource.TOUCH;
+                lastTouchTimeMs = System.currentTimeMillis();
+                setOnScreenControlsVisible(true);
+            } catch (Throwable ignored) { }
             showHome(false);
             restartEmuThread();
             return;
         }
 
         m_szGamefile = uri.toString();
-        try { lastInput = InputSource.TOUCH; lastTouchTimeMs = System.currentTimeMillis(); setOnScreenControlsVisible(true); } catch (Throwable ignored) {}
+        try {
+            lastInput = InputSource.TOUCH; lastTouchTimeMs = System.currentTimeMillis();
+            setOnScreenControlsVisible(true);
+        } catch (Throwable ignored) { }
         showHome(false);
         restartEmuThread();
     }
@@ -3324,7 +3396,7 @@ public class MainActivity extends AppCompatActivity {
                 int idx = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);
                 if (idx >= 0) return c.getString(idx);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { }
         return null;
     }
 
@@ -3333,8 +3405,9 @@ public class MainActivity extends AppCompatActivity {
         java.io.FileOutputStream out = null;
         try {
             java.io.File dir = new java.io.File(getCacheDir(), "games");
-            if (!dir.exists()) 
+            if (!dir.exists()) {
                 dir.mkdirs();
+            }
             String ext = "";
             int dot = fileName.lastIndexOf('.');
             if (dot > 0) ext = fileName.substring(dot);
@@ -3351,8 +3424,12 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception ignored) {
             return null;
         } finally {
-            try { if (in != null) in.close(); } catch (Exception ignored) {}
-            try { if (out != null) out.close(); } catch (Exception ignored) {}
+            try {
+                if (in != null) in.close();
+            } catch (Exception ignored) { }
+            try {
+                if (out != null) out.close();
+            } catch (Exception ignored) { }
         }
     }
 
@@ -3372,7 +3449,6 @@ public class MainActivity extends AppCompatActivity {
             return buf;
         } catch (Exception ignored) { return null; }
     }
-
 
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
@@ -3439,11 +3515,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendKeyAction(View p_view, int p_action, int p_keycode) {
-        if(p_action == MotionEvent.ACTION_DOWN) {
+        if (p_action == MotionEvent.ACTION_DOWN) {
             p_view.setPressed(true);
             int pad_force = 0;
             if (p_keycode >= 110) {
-                float _abs = 90; 
+                float _abs = 90;
                 _abs = Math.min(_abs, 100);
                 pad_force = (int) (_abs * 32766.0f / 100);
             }
@@ -3451,9 +3527,11 @@ public class MainActivity extends AppCompatActivity {
             lastInput = InputSource.TOUCH;
             lastTouchTimeMs = System.currentTimeMillis();
             maybeAutoHideControls();
-        } else if(p_action == MotionEvent.ACTION_UP || p_action == MotionEvent.ACTION_CANCEL) {
-            p_view.setPressed(false);
-            NativeApp.setPadButton(p_keycode, 0, false);
+        } else {
+            if (p_action == MotionEvent.ACTION_UP || p_action == MotionEvent.ACTION_CANCEL) {
+                p_view.setPressed(false);
+                NativeApp.setPadButton(p_keycode, 0, false);
+            }
         }
     }
 
@@ -3467,8 +3545,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setOnScreenControlsVisible(true);
             getWindow().getDecorView().removeCallbacks(hideRunnable);
-            if (hideDelayMs != 0L)
+            if (hideDelayMs != 0L) {
                 getWindow().getDecorView().postDelayed(hideRunnable, hideDelayMs);
+            }
         }
     }
 
@@ -3492,11 +3571,11 @@ public class MainActivity extends AppCompatActivity {
         if (leftShoulders != null) leftShoulders.setVisibility(vis);
         View rightShoulders = findViewById(R.id.ll_pad_shoulders_right);
         if (rightShoulders != null) rightShoulders.setVisibility(vis);
-        
+
         JoystickView joystickLeft = findViewById(R.id.joystick_left);
         JoystickView joystickRight = findViewById(R.id.joystick_right);
         DPadView dpadView = findViewById(R.id.dpad_view);
-        
+
         if (joystickLeft != null) {
             if (currentControllerMode == 2) {
                 joystickLeft.setVisibility(View.GONE);
@@ -3504,7 +3583,7 @@ public class MainActivity extends AppCompatActivity {
                 joystickLeft.setVisibility(vis);
             }
         }
-        
+
         if (joystickRight != null) {
             if (currentControllerMode == 1 || currentControllerMode == 2) {
                 joystickRight.setVisibility(View.GONE);
@@ -3512,7 +3591,7 @@ public class MainActivity extends AppCompatActivity {
                 joystickRight.setVisibility(vis);
             }
         }
-        
+
         if (dpadView != null) {
             if (currentControllerMode == 1) {
                 dpadView.setVisibility(View.GONE);
@@ -3520,7 +3599,7 @@ public class MainActivity extends AppCompatActivity {
                 dpadView.setVisibility(vis);
             }
         }
-        
+
         if (!visible) {
             hideDrawerToggle();
         }
@@ -3530,11 +3609,11 @@ public class MainActivity extends AppCompatActivity {
                 if (hideDelayMs != 0L && lastInput == InputSource.TOUCH) {
                     getWindow().getDecorView().postDelayed(hideRunnable, hideDelayMs);
                 }
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
         } else if (disableTouchControls) {
             try {
                 getWindow().getDecorView().removeCallbacks(hideRunnable);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
         }
     }
 
@@ -3604,9 +3683,9 @@ public class MainActivity extends AppCompatActivity {
         String message = "Android denied direct file access for:\n" + targetDir.getAbsolutePath() +
                 "\n\nGrant 'Allow access to all files' in system settings or choose a folder inside ARMSX2's storage.";
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
-            .setTitle("Permission required")
-            .setMessage(message)
-            .setNegativeButton("OK", (d, w) -> d.dismiss());
+                .setTitle("Permission required")
+                .setMessage(message)
+                .setNegativeButton("OK", (d, w) -> d.dismiss());
         if (canGrant) {
             builder.setPositiveButton("Open settings", (d, w) -> {
                 d.dismiss();
@@ -3626,7 +3705,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
                     startActivity(intent);
-                } catch (Exception ignored2) {}
+                } catch (Exception ignored2) { }
             }
         }
     }
@@ -3638,7 +3717,13 @@ public class MainActivity extends AppCompatActivity {
                     String name = queryOpenableDisplayName(uri);
                     String low = name != null ? name.toLowerCase() : uri.toString().toLowerCase();
                     if (!low.endsWith(".iso")) {
-                        try { new MaterialAlertDialogBuilder(this).setTitle("Not an ISO").setMessage("Please select a .iso file.").setPositiveButton("OK", (d,w)-> d.dismiss()).show(); } catch (Throwable ignored) {}
+                        try {
+                            new MaterialAlertDialogBuilder(this)
+                                    .setTitle("Not an ISO")
+                                    .setMessage("Please select a .iso file.")
+                                    .setPositiveButton("OK", (d, w) -> d.dismiss())
+                                    .show();
+                        } catch (Throwable ignored) { }
                         return;
                     }
                     performIsoToChd(uri, name);
@@ -3660,7 +3745,9 @@ public class MainActivity extends AppCompatActivity {
             i.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
             startActivityResultPickIso.launch(i);
         } catch (Throwable t) {
-            try { Toast.makeText(this, "Unable to open file picker", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+            try {
+                Toast.makeText(this, "Unable to open file picker", Toast.LENGTH_SHORT).show();
+            } catch (Throwable ignored) { }
         }
     }
 
@@ -3674,7 +3761,7 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage(errorMsg)
                         .setPositiveButton("OK", (d, w) -> d.dismiss())
                         .show();
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
             return;
         }
 
@@ -3688,7 +3775,7 @@ public class MainActivity extends AppCompatActivity {
                 // Get real file path from URI
                 android.util.Log.i("ARMSX2_CHD", "Starting ISO to CHD conversion for: " + isoDisplayName);
                 android.util.Log.i("ARMSX2_CHD", "Input URI: " + isoUri.toString());
-                
+
                 inputPath = getFilePathFromUri(isoUri);
                 if (inputPath == null) {
                     resultMessage = "Could not access the selected ISO file. Please ensure the file is accessible.";
@@ -3697,11 +3784,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 android.util.Log.i("ARMSX2_CHD", "Input path resolved to: " + inputPath);
 
-                // Generate output CHD path to match what Rust will create 
+                // Generate output CHD path to match what Rust will create
                 outputPath = inputPath.replaceAll("\\.iso$", ".chd");
                 android.util.Log.i("ARMSX2_CHD", "Expected output path: " + outputPath);
 
-                // Call native conversion 
+                // Call native conversion
                 android.util.Log.i("ARMSX2_CHD", "Calling native conversion...");
                 try {
                     android.util.Log.d("ARMSX2_CHD", "Input path bytes: " + java.util.Arrays.toString(inputPath.getBytes("UTF-8")));
@@ -3712,9 +3799,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 int result = NativeApp.convertIsoToChd(inputPath);
                 android.util.Log.i("ARMSX2_CHD", "Native conversion returned code: " + result);
-                
+
                 success = handleConversionResult(result, inputPath, outputPath);
-                
+
                 if (success) {
                     final String chdCachePath = outputPath;
                     final String chdDisplayName = isoDisplayName;
@@ -3768,14 +3855,14 @@ public class MainActivity extends AppCompatActivity {
                         int displayNameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);
                         if (displayNameIndex >= 0) {
                             String displayName = cursor.getString(displayNameIndex);
-                            
+
                             File cacheDir = getCacheDir();
                             File tempFile = new File(cacheDir, displayName);
                             android.util.Log.d("ARMSX2_CHD", "Creating temporary file: " + tempFile.getAbsolutePath());
-                            
+
                             try (java.io.InputStream input = getContentResolver().openInputStream(uri);
                                  java.io.FileOutputStream output = new java.io.FileOutputStream(tempFile)) {
-                                
+
                                 if (input != null) {
                                     byte[] buffer = new byte[8192];
                                     int bytesRead;
@@ -3888,12 +3975,12 @@ public class MainActivity extends AppCompatActivity {
                     .setMessage(message)
                     .setPositiveButton("OK", (d, w) -> d.dismiss())
                     .show();
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
     }
 
     private void loadHideTimeoutFromPrefs() {
         try {
-            android.content.SharedPreferences sp = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            SharedPreferences sp = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
             int sec = sp.getInt(PREF_HIDE_CONTROLS_SECONDS, 10); 
             if (sec < 0) sec = 0;
             if (sec > 60) sec = 60;
@@ -4037,14 +4124,14 @@ public class MainActivity extends AppCompatActivity {
             usedController = true;
             try {
                 SDLControllerManager.hapticRumble(deviceId, clampedLarge, clampedSmall, RUMBLE_DURATION_MS);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
         }
 
         final int vibratorServiceId = 999999;
         if (!usedController) {
             try {
                 SDLControllerManager.hapticRun(vibratorServiceId, combined, RUMBLE_DURATION_MS);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
         }
     }
 
@@ -4056,10 +4143,10 @@ public class MainActivity extends AppCompatActivity {
         final int deviceId = sLastControllerDeviceId;
         try {
             if (deviceId >= 0) SDLControllerManager.hapticStop(deviceId);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
         try {
             SDLControllerManager.hapticStop(999999);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
     }
 
     private static float clamp01(float value) {
@@ -4078,7 +4165,7 @@ public class MainActivity extends AppCompatActivity {
                 NativeApp.setSetting("Pad1", "Vibration", "bool", "true");
                 enabled = true;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { }
         setVibrationPreference(enabled);
     }
 
@@ -4103,7 +4190,7 @@ public class MainActivity extends AppCompatActivity {
                         final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                         try {
                             getContentResolver().takePersistableUriPermission(tree, takeFlags);
-                        } catch (SecurityException ignored) {}
+                        } catch (SecurityException ignored) { }
                         handleDataDirectorySelection(tree);
                         return;
                     }
@@ -4124,12 +4211,12 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                             getContentResolver().takePersistableUriPermission(tree, takeFlags);
-                        } catch (SecurityException ignored) {}
+                        } catch (SecurityException ignored) { }
                         gamesFolderUri = tree;
                         try {
                             getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                                 .edit().putString(PREF_GAMES_URI, tree.toString()).apply();
-                        } catch (Throwable ignored) {}
+                        } catch (Throwable ignored) { }
                         scanGamesFolder(tree);
                     }
                 }
@@ -4184,30 +4271,72 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void scanGamesFolder(Uri folder) {
-    List<GameEntry> entries = GameScanner.scanFolder(this, folder);
-        try {
-            java.util.Collections.sort(entries, (a, b) -> {
-                String ta = a != null ? (a.title != null ? a.title : "") : "";
-                String tb = b != null ? (b.title != null ? b.title : "") : "";
-                int ga = sortGroup(ta);
-                int gb = sortGroup(tb);
-                if (ga != gb) return Integer.compare(ga, gb);
-                return ta.compareToIgnoreCase(tb);
-            });
-        } catch (Throwable ignored) {}
-    gamesAdapter.update(entries);
-        final List<GameEntry> toResolve = new ArrayList<>();
-        for (GameEntry ge : entries) {
-            try {
-                if (ge != null && (ge.serial == null || ge.serial.isEmpty())) {
-                    String name = ge.title != null ? ge.title.toLowerCase() : "";
-                    if (name.endsWith(".iso") || name.endsWith(".img") || name.endsWith(".bin"))
-                        toResolve.add(ge);
-                }
-            } catch (Throwable ignored) {}
+        if (tvEmpty != null) {
+            tvEmpty.setText("Scanning games...");
+            tvEmpty.setVisibility(View.VISIBLE);
         }
-        if (!toResolve.isEmpty()) {
-            new Thread(() -> {
+        new Thread(() -> {
+            List<GameEntry> entries = GameScanner.scanFolder(this, folder);
+            try {
+                java.util.Collections.sort(entries, (a, b) -> {
+                    String ta = a != null ? (a.title != null ? a.title : "") : "";
+                    String tb = b != null ? (b.title != null ? b.title : "") : "";
+                    int ga = sortGroup(ta);
+                    int gb = sortGroup(tb);
+                    if (ga != gb) return Integer.compare(ga, gb);
+                    return ta.compareToIgnoreCase(tb);
+                });
+            } catch (Throwable ignored) { }
+            final List<GameEntry> toResolve = new ArrayList<>();
+            for (GameEntry ge : entries) {
+                try {
+                    if (ge != null && (ge.serial == null || ge.serial.isEmpty())) {
+                        String name = ge.title != null ? ge.title.toLowerCase() : "";
+                        if (name.endsWith(".iso") || name.endsWith(".img") || name.endsWith(".bin")) {
+                            toResolve.add(ge);
+                        }
+                    }
+                } catch (Throwable ignored) { }
+            }
+            runOnUiThread(() -> {
+                gamesAdapter.update(entries);
+                if (etSearch != null && etSearch.getText() != null && etSearch.length() > 0) {
+                    gamesAdapter.setFilter(etSearch.getText().toString());
+                }
+
+                if (rvGames != null && gamesAdapter.getItemCount() > 0) {
+                    rvGames.post(() -> {
+                        rvGames.requestFocus();
+                        rvGames.postDelayed(() -> {
+                            RecyclerView.ViewHolder vh = rvGames.findViewHolderForAdapterPosition(0);
+                            if (vh != null && vh.itemView != null) {
+                                vh.itemView.requestFocus();
+                            }
+                        }, 100);
+                    });
+                }
+
+                boolean empty = entries.isEmpty();
+                try {
+                    Toast.makeText(this, "Found " + entries.size() + " game(s)", Toast.LENGTH_SHORT).show();
+                } catch (Throwable ignored) { }
+
+                if (tvEmpty != null) {
+                    tvEmpty.setText(empty ? "No games detected in this folder" : "");
+                    tvEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
+                }
+
+                if (emptyContainer != null) {
+                    emptyContainer.setVisibility(empty ? View.VISIBLE : View.GONE);
+                }
+
+                if (rvGames != null) {
+                    rvGames.setVisibility(empty ? View.GONE : View.VISIBLE);
+                }
+
+                if (!empty) showHome(true);
+            });
+            if (!toResolve.isEmpty()) {
                 android.content.ContentResolver cr = getContentResolver();
                 int n = 0;
                 for (GameEntry ge : toResolve) {
@@ -4221,35 +4350,12 @@ public class MainActivity extends AppCompatActivity {
                                 runOnUiThread(() -> gamesAdapter.notifyDataSetChanged());
                             }
                         }
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) { }
                 }
-                if (n > 0) runOnUiThread(() -> gamesAdapter.notifyDataSetChanged());
-            }, "RedumpResolve").start();
-        }
-        if (etSearch != null && etSearch.getText() != null && etSearch.length() > 0) {
-            gamesAdapter.setFilter(etSearch.getText().toString());
-        }
-        if (rvGames != null && gamesAdapter.getItemCount() > 0) {
-            rvGames.post(() -> {
-                rvGames.requestFocus(); 
-                rvGames.postDelayed(() -> {
-                    RecyclerView.ViewHolder vh = rvGames.findViewHolderForAdapterPosition(0);
-                    if (vh != null && vh.itemView != null) {
-                        vh.itemView.requestFocus();
-                    }
-                }, 100); 
-            });
-        }
-        boolean empty = entries.isEmpty();
-    try { Toast.makeText(this, "Found " + entries.size() + " game(s)", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
-        if (tvEmpty != null) {
-            tvEmpty.setText(empty ? "No games detected in this folder" : "");
-            tvEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
-        }
-        if (emptyContainer != null) emptyContainer.setVisibility(empty ? View.VISIBLE : View.GONE);
-        if (rvGames != null) rvGames.setVisibility(empty ? View.GONE : View.VISIBLE);
-        if (!empty) showHome(true);
 
+                if (n > 0) runOnUiThread(() -> gamesAdapter.notifyDataSetChanged());
+            }
+        }, "RedumpResolve").start();
     }
 
     private static int sortGroup(String title) {
@@ -4257,25 +4363,27 @@ public class MainActivity extends AppCompatActivity {
         String t = title.trim();
         if (t.isEmpty()) return 2;
         char c = t.charAt(0);
-        if (c >= '0' && c <= '9') return 0; 
-        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) return 1; 
+        if (c >= '0' && c <= '9') return 0;
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) return 1;
         return 2;
     }
 
     private void showHome(boolean show) {
-    if (homeContainer != null) homeContainer.setVisibility(show ? View.VISIBLE : View.GONE);
-    if (drawerLayout != null) {
-        drawerLayout.setVisibility(show ? View.VISIBLE : View.GONE);
-        try {
-            drawerLayout.setDrawerLockMode(show ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            drawerLayout.setScrimColor(android.graphics.Color.TRANSPARENT);
-        } catch (Throwable ignored) {}
-    }
+        if (homeContainer != null) {
+    	    homeContainer.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+        if (drawerLayout != null) {
+            drawerLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+            try {
+                drawerLayout.setDrawerLockMode(show ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                drawerLayout.setScrimColor(android.graphics.Color.TRANSPARENT);
+            } catch (Throwable ignored) { }
+        }
         if (inGameDrawer != null) {
             if (show) {
                 try {
                     inGameDrawer.closeDrawer(GravityCompat.START);
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) { }
                 inGameDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             } else {
                 inGameDrawer.setDrawerLockMode(disableTouchControls ? DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -4310,12 +4418,13 @@ public class MainActivity extends AppCompatActivity {
             if (show) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
             } else {
-                if (TextUtils.isEmpty(m_szGamefile))
+                if (TextUtils.isEmpty(m_szGamefile)) {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-                else
+                } else {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
         if (show && tvEmpty != null && gamesFolderUri == null) {
             tvEmpty.setText("Choose a games folder");
             tvEmpty.setVisibility(View.VISIBLE);
@@ -4341,7 +4450,7 @@ public class MainActivity extends AppCompatActivity {
         pendingGameUri = null;
         try {
             getWindow().getDecorView().removeCallbacks(pendingLaunchRunnable);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
         stopEmuThread();
         m_szGamefile = "";
         showHome(true);
@@ -4379,7 +4488,7 @@ public class MainActivity extends AppCompatActivity {
         if (inGameDrawer != null) {
             try {
                 inGameDrawer.closeDrawer(GravityCompat.START);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) { }
             inGameDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
     }
@@ -4404,7 +4513,7 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                             getContentResolver().takePersistableUriPermission(img, takeFlags);
-                        } catch (SecurityException ignored) {}
+                        } catch (SecurityException ignored) { }
                         getSharedPreferences(PREFS, MODE_PRIVATE).edit()
                                 .putString(portrait ? PREF_BG_P : PREF_BG_L, img.toString())
                                 .apply();
@@ -4414,31 +4523,40 @@ public class MainActivity extends AppCompatActivity {
             });
     private void applySavedBackground() {
         if (bgImage == null) return;
-        android.content.SharedPreferences sp = getSharedPreferences(PREFS, MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(PREFS, MODE_PRIVATE);
         String l = sp.getString(PREF_BG_L, null);
         String p = sp.getString(PREF_BG_P, null);
         boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         String use = isPortrait ? (p != null ? p : l) : (l != null ? l : p);
-        if (use == null || use.isEmpty()) { bgImage.setImageDrawable(null); bgImage.setVisibility(View.GONE); return; }
+        if (use == null || use.isEmpty()) {
+            bgImage.setImageDrawable(null);
+            bgImage.setVisibility(View.GONE);
+            return;
+        }
         try (InputStream is = getContentResolver().openInputStream(Uri.parse(use))) {
             if (is != null) {
-                android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeStream(is);
+                Bitmap bmp = BitmapFactory.decodeStream(is);
                 if (bmp != null) {
                     bgImage.setImageBitmap(bmp);
                     bgImage.setVisibility(View.VISIBLE);
                     if (android.os.Build.VERSION.SDK_INT >= 31) {
                         try {
                             bgImage.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(0f, 8f, android.graphics.Shader.TileMode.CLAMP));
-                        } catch (Throwable ignored) {}
+                        } catch (Throwable ignored) { }
                     }
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { }
     }
     private void clearBackgroundImages() {
         getSharedPreferences(PREFS, MODE_PRIVATE).edit().remove(PREF_BG_L).remove(PREF_BG_P).apply();
-        if (bgImage != null) { bgImage.setImageDrawable(null); bgImage.setVisibility(View.GONE); }
-        try { Toast.makeText(this, "Background cleared.", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+        if (bgImage != null) {
+        	bgImage.setImageDrawable(null);
+        	bgImage.setVisibility(View.GONE);
+        }
+        try {
+            Toast.makeText(this, "Background cleared.", Toast.LENGTH_SHORT).show();
+        } catch (Throwable ignored) { }
     }
     // endregion Background image picker
 
@@ -4453,18 +4571,22 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         // Start BIOS first
-        try { Toast.makeText(this, "Preflight: booting BIOS…", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+        try {
+            Toast.makeText(this, "Preflight: booting BIOS…", Toast.LENGTH_SHORT).show();
+        } catch (Throwable ignored) { }
         pendingGameUri = uri;
         pendingLaunchRetries = 0;
-    bootBios();
-    getWindow().getDecorView().postDelayed(pendingLaunchRunnable, 900);
-    schedulePreflightFallback();
+        bootBios();
+        getWindow().getDecorView().postDelayed(pendingLaunchRunnable, 900);
+        schedulePreflightFallback();
     }
 
     private final Runnable pendingLaunchRunnable = new Runnable() {
         @Override public void run() {
             if (pendingGameUri == null) return;
-            try { Toast.makeText(MainActivity.this, "Preflight: launching selected game…", Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+            try {
+                Toast.makeText(MainActivity.this, "Preflight: launching selected game…", Toast.LENGTH_SHORT).show();
+            } catch (Throwable ignored) { }
             Uri toLaunch = pendingGameUri;
             pendingGameUri = null;
             handleSelectedGameUri(toLaunch);
@@ -4480,18 +4602,20 @@ public class MainActivity extends AppCompatActivity {
                     handleSelectedGameUri(toLaunch);
                 }
             }, 2000);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
     }
 
     private void bootBios() {
         m_szGamefile = "";
         showHome(false);
-        try { setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR); } catch (Throwable ignored) {}
+        try {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        } catch (Throwable ignored) { }
         try {
             lastInput = InputSource.TOUCH;
             lastTouchTimeMs = System.currentTimeMillis();
             setOnScreenControlsVisible(true);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) { }
         if (isThread()) {
             restartEmuThread();
         } else {
@@ -4499,601 +4623,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    static class GameEntry {
-        final String title;      
-        final Uri uri;
-        String serial;           
-        String gameTitle;        
-        GameEntry(String t, Uri u) { title = t; uri = u; }
-        String fileTitleNoExt() {
-            int i = title.lastIndexOf('.');
-            return (i > 0) ? title.substring(0, i) : title;
-        }
-    }
-
-    static class GameScanner {
-    static final String[] EXTS = new String[]{".iso", ".img", ".bin", ".cso", ".zso", ".chd", ".gz"};
-    static List<GameEntry> scanFolder(Context ctx, Uri treeUri) {
-            List<GameEntry> out = new ArrayList<>();
-            android.content.ContentResolver cr = ctx.getContentResolver();
-            try {
-                String rootId = android.provider.DocumentsContract.getTreeDocumentId(treeUri);
-                scanChildren(cr, treeUri, rootId, out, 0, 3);
-            } catch (Exception ignored) {}
-            return out;
-        }
-
-        static List<String> debugList(Context ctx, Uri treeUri) {
-            List<String> out = new ArrayList<>();
-            try {
-                android.content.ContentResolver cr = ctx.getContentResolver();
-                String rootId = android.provider.DocumentsContract.getTreeDocumentId(treeUri);
-                debugChildren(cr, treeUri, rootId, out, 0, 3, "/");
-            } catch (Exception e) { out.add("Error: " + e.getMessage()); }
-            return out;
-        }
-
-        private static void scanChildren(android.content.ContentResolver cr, Uri treeUri, String parentDocId,
-                                         List<GameEntry> out, int depth, int maxDepth) {
-            if (depth > maxDepth) return;
-            Uri children = android.provider.DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, parentDocId);
-            try (android.database.Cursor c = cr.query(children, new String[]{
-                    android.provider.DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                    android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                    android.provider.DocumentsContract.Document.COLUMN_MIME_TYPE
-            }, null, null, null)) {
-                if (c == null) return;
-                while (c.moveToNext()) {
-                    String docId = c.getString(0);
-                    String name = c.getString(1);
-                    String mime = c.getString(2);
-                    if (mime != null && mime.equals(android.provider.DocumentsContract.Document.MIME_TYPE_DIR)) {
-                        scanChildren(cr, treeUri, docId, out, depth + 1, maxDepth);
-                        continue;
-                    }
-                    if (name == null) name = "Unknown";
-                    String lower = name.toLowerCase();
-                    boolean matchExt = false;
-                    for (String ext : EXTS) { if (lower.endsWith(ext)) { matchExt = true; break; } }
-                    boolean matchMime = false;
-                    if (mime != null) {
-                        String lm = mime.toLowerCase();
-                        if (lm.contains("iso9660") || lm.equals("application/x-iso9660-image")) matchMime = true;
-                    }
-                    boolean match = matchExt || matchMime;
-                    if (!match) continue;
-                    Uri doc = android.provider.DocumentsContract.buildDocumentUriUsingTree(treeUri, docId);
-                    GameEntry e = new GameEntry(name, doc);
-                    String ft = e.fileTitleNoExt();
-                    String s = parseSerialFromString(ft);
-                    if (s != null) e.serial = s;
-                    String lowerName = name != null ? name.toLowerCase() : "";
-                    if (e.serial == null && (lowerName.endsWith(".iso") || lowerName.endsWith(".img") || lowerName.endsWith(".cso") || lowerName.endsWith(".zso"))) {
-                        try {
-                            String isoSerial = tryExtractIsoSerial(cr, doc);
-                            if (isoSerial != null) e.serial = isoSerial;
-                        } catch (Throwable t) {
-                            try { DebugLog.d("ISO", "Serial parse failed: " + t.getMessage()); } catch (Throwable ignored) {}
-                        }
-                    }
-                    if (e.serial == null && lowerName.endsWith(".bin")) {
-                        try {
-                            String quick = tryExtractBinSerialQuick(cr, doc);
-                            if (quick != null) e.serial = quick;
-                        } catch (Throwable t) {
-                            try { DebugLog.d("BIN", "Quick serial scan failed: " + t.getMessage()); } catch (Throwable ignored) {}
-                        }
-                    }
-                    out.add(e);
-                }
-            } catch (Exception ignored) {}
-        }
-
-        private static void debugChildren(android.content.ContentResolver cr, Uri treeUri, String parentDocId,
-                                           List<String> out, int depth, int maxDepth, String pathPrefix) {
-            if (depth > maxDepth) return;
-            Uri children = android.provider.DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, parentDocId);
-            try (android.database.Cursor c = cr.query(children, new String[]{
-                    android.provider.DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                    android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                    android.provider.DocumentsContract.Document.COLUMN_MIME_TYPE
-            }, null, null, null)) {
-                if (c == null) return;
-                while (c.moveToNext()) {
-                    String docId = c.getString(0);
-                    String name = c.getString(1);
-                    String mime = c.getString(2);
-                    String display = pathPrefix + (name != null ? name : "<null>") + (mime != null && mime.equals(android.provider.DocumentsContract.Document.MIME_TYPE_DIR) ? "/" : "");
-                    boolean dir = mime != null && mime.equals(android.provider.DocumentsContract.Document.MIME_TYPE_DIR);
-                    boolean accept = false;
-                    if (!dir && name != null) {
-                        String lower = name.toLowerCase();
-                        boolean matchExt = false;
-                        for (String ext : EXTS) { if (lower.endsWith(ext)) { matchExt = true; break; } }
-                        boolean matchMime = false;
-                        if (mime != null) {
-                            String lm = mime.toLowerCase();
-                            if (lm.contains("iso9660") || lm.equals("application/x-iso9660-image")) matchMime = true;
-                        }
-                        accept = matchExt || matchMime;
-                    }
-                    out.add("[" + (mime == null ? "null" : mime) + "] " + display + (dir ? "" : (accept ? "  -> accepted" : "  -> skipped")));
-                    if (mime != null && mime.equals(android.provider.DocumentsContract.Document.MIME_TYPE_DIR)) {
-                        debugChildren(cr, treeUri, docId, out, depth + 1, maxDepth, display);
-                    }
-                }
-            } catch (Exception e) { out.add("Error listing: " + e.getMessage()); }
-        }
-        static String stripExt(String name) {
-            int i = name.lastIndexOf('.');
-            return (i > 0) ? name.substring(0, i) : name;
-        }
-
-    static String parseSerialFromString(String s) {
-            if (s == null) return null;
-        java.util.regex.Pattern p = java.util.regex.Pattern.compile(
-            "(S[CL](?:ES|US|PS|CS)?[-_]?[0-9]{3,5}(?:\\.[0-9]{2})?)",
-            java.util.regex.Pattern.CASE_INSENSITIVE);
-            java.util.regex.Matcher m = p.matcher(s);
-            if (m.find()) {
-                String v = m.group(1).toUpperCase();
-                v = v.replace('_','-');
-                v = v.replace(".", "");
-                v = v.replaceAll("^([A-Z]+)([0-9])", "$1-$2");
-                return v;
-            }
-            return null;
-        }
-
-        static String tryExtractIsoSerial(android.content.ContentResolver cr, Uri uri) throws java.io.IOException {
-            final int SECTOR = 2048;
-            byte[] pvd = readRange(cr, uri, 16L * SECTOR, SECTOR);
-            if (pvd == null || pvd.length < SECTOR) return null;
-            if (pvd[0] != 0x01 || pvd[1] != 'C' || pvd[2] != 'D' || pvd[3] != '0' || pvd[4] != '0' || pvd[5] != '1')
-                return null;
-            int rootLBA = u32le(pvd, 156 + 2);
-            int rootSize = u32le(pvd, 156 + 10);
-            if (rootLBA <= 0 || rootSize <= 0 || rootSize > 512 * 1024) rootSize = 64 * 1024;
-            byte[] dir = readRange(cr, uri, (long) rootLBA * SECTOR, rootSize);
-            if (dir == null) return null;
-            int off = 0;
-            while (off < dir.length) {
-                int len = u8(dir, off);
-                if (len == 0) {
-                    int next = ((off / SECTOR) + 1) * SECTOR;
-                    if (next <= off) break;
-                    off = next;
-                    continue;
-                }
-                if (off + len > dir.length) break;
-                int lba = u32le(dir, off + 2);
-                int size = u32le(dir, off + 10);
-                int nameLen = u8(dir, off + 32);
-                int namePos = off + 33;
-                if (namePos + nameLen <= dir.length && nameLen > 0) {
-                    String name = new String(dir, namePos, nameLen, java.nio.charset.StandardCharsets.US_ASCII);
-                    if (!(nameLen == 1 && (dir[namePos] == 0 || dir[namePos] == 1))) {
-                        String norm = name;
-                        int semi = norm.indexOf(';');
-                        if (semi >= 0) norm = norm.substring(0, semi);
-                        if ("SYSTEM.CNF".equalsIgnoreCase(norm)) {
-                            int readSize = Math.min(size, 4096);
-                            byte[] cnf = readRange(cr, uri, (long) lba * SECTOR, readSize);
-                            if (cnf != null) {
-                                String txt = new String(cnf, java.nio.charset.StandardCharsets.US_ASCII);
-                java.util.regex.Matcher m = java.util.regex.Pattern.compile(
-                    "BOOT\\d*\\s*=\\s*[^\\\\\\r\\n]*\\\\([A-Z0-9_\\.]+)",
-                    java.util.regex.Pattern.CASE_INSENSITIVE).matcher(txt);
-                                if (m.find()) {
-                                    String bootElf = m.group(1);
-                                    String serial = parseSerialFromString(bootElf);
-                                    if (serial != null) return serial;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                off += len;
-            }
-            return null;
-        }
-
-        static String tryExtractBinSerialQuick(android.content.ContentResolver cr, Uri uri) throws java.io.IOException {
-            final int MAX = 8 * 1024 * 1024; 
-            byte[] buf;
-            try (java.io.InputStream in = CsoUtils.openInputStream(cr, uri)) {
-                if (in == null) return null;
-                java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream(Math.min(MAX, 1 << 20));
-                byte[] tmp = new byte[64 * 1024];
-                int total = 0;
-                while (total < MAX) {
-                    int want = Math.min(tmp.length, MAX - total);
-                    int r = in.read(tmp, 0, want);
-                    if (r <= 0) break;
-                    bos.write(tmp, 0, r);
-                    total += r;
-                }
-                buf = bos.toByteArray();
-            }
-            if (buf == null || buf.length == 0) return null;
-            String txt = new String(buf, java.nio.charset.StandardCharsets.US_ASCII);
-            java.util.regex.Matcher m = java.util.regex.Pattern.compile(
-                "BOOT\\d*\\s*=\\s*[^\\\\\\r\\n]*\\\\([A-Z0-9_\\.]+)",
-                java.util.regex.Pattern.CASE_INSENSITIVE).matcher(txt);
-            if (m.find()) {
-                String bootElf = m.group(1);
-                String serial = parseSerialFromString(bootElf);
-                if (serial != null) return serial;
-            }
-            String s2 = parseSerialFromString(txt);
-            return s2;
-        }
-
-        private static int u8(byte[] a, int i) { return (i >= 0 && i < a.length) ? (a[i] & 0xFF) : 0; }
-        private static int u32le(byte[] a, int i) {
-            if (i + 3 >= a.length) return 0;
-            return (a[i] & 0xFF) | ((a[i+1] & 0xFF) << 8) | ((a[i+2] & 0xFF) << 16) | ((a[i+3] & 0xFF) << 24);
-        }
-        private static byte[] readRange(android.content.ContentResolver cr, Uri uri, long offset, int size) throws java.io.IOException {
-            if (size <= 0) return null;
-            if (size > 2 * 1024 * 1024) size = 2 * 1024 * 1024;
-            byte[] csoBytes = CsoUtils.readRange(cr, uri, offset, size);
-            if (csoBytes != null) {
-                return csoBytes;
-            }
-            try (java.io.InputStream in = cr.openInputStream(uri)) {
-                if (in == null) return null;
-                long toSkip = offset;
-                byte[] skipBuf = new byte[8192];
-                while (toSkip > 0) {
-                    long skipped = in.skip(toSkip);
-                    if (skipped <= 0) {
-                        int r = in.read(skipBuf, 0, (int) Math.min(skipBuf.length, toSkip));
-                        if (r <= 0) break;
-                        toSkip -= r;
-                    } else {
-                        toSkip -= skipped;
-                    }
-                }
-                byte[] buf = new byte[size];
-                int off2 = 0;
-                while (off2 < size) {
-                    int r = in.read(buf, off2, size - off2);
-                    if (r <= 0) break;
-                    off2 += r;
-                }
-                if (off2 == 0) return null;
-                if (off2 < size) return java.util.Arrays.copyOf(buf, off2);
-                return buf;
-            }
-        }
-    }
-
-    private static final class CsoUtils {
-        private static final int MAGIC_CISO = 0x4F534943;
-        private static final int MAGIC_ZISO = 0x4F53495A;
-
-        private CsoUtils() {}
-
-        @Nullable
-        static byte[] readRange(android.content.ContentResolver cr, Uri uri, long offset, int size) {
-            CsoReader reader = null;
-            try {
-                reader = CsoReader.open(cr, uri);
-                if (reader == null) {
-                    return null;
-                }
-                return reader.readRange(offset, size);
-            } catch (Exception ignored) {
-                return null;
-            } finally {
-                closeQuietly(reader);
-            }
-        }
-
-        @Nullable
-        static java.io.InputStream openInputStream(android.content.ContentResolver cr, Uri uri) throws java.io.IOException {
-            CsoReader reader = CsoReader.open(cr, uri);
-            if (reader == null) {
-                return cr.openInputStream(uri);
-            }
-            return new CsoInputStream(reader);
-        }
-
-        private static void closeQuietly(@Nullable Closeable closeable) {
-            if (closeable == null) {
-                return;
-            }
-            try {
-                closeable.close();
-            } catch (Exception ignored) {}
-        }
-
-        private static final class CsoReader implements Closeable {
-            private final ParcelFileDescriptor descriptor;
-            private final FileInputStream inputStream;
-            private final FileChannel channel;
-            private final long uncompressedSize;
-            private final int blockSize;
-            private final int alignShift;
-            private final int[] indexTable;
-            private final int blockCount;
-
-            private CsoReader(ParcelFileDescriptor descriptor, FileInputStream inputStream, FileChannel channel,
-                              long uncompressedSize, int blockSize, int alignShift, int[] indexTable) {
-                this.descriptor = descriptor;
-                this.inputStream = inputStream;
-                this.channel = channel;
-                this.uncompressedSize = uncompressedSize;
-                this.blockSize = blockSize;
-                this.alignShift = alignShift;
-                this.indexTable = indexTable;
-                this.blockCount = indexTable.length - 1;
-            }
-
-            static CsoReader open(android.content.ContentResolver cr, Uri uri) throws java.io.IOException {
-                ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
-                if (pfd == null) {
-                    return null;
-                }
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(pfd.getFileDescriptor());
-                    FileChannel channel = fis.getChannel();
-                    ByteBuffer header = ByteBuffer.allocate(0x18).order(ByteOrder.LITTLE_ENDIAN);
-                    if (channel.read(header) < 0x18) {
-                        closeQuietly(fis);
-                        closeQuietly(pfd);
-                        return null;
-                    }
-                    header.flip();
-                    int magic = header.getInt();
-                    if (magic != MAGIC_CISO && magic != MAGIC_ZISO) {
-                        closeQuietly(fis);
-                        closeQuietly(pfd);
-                        return null;
-                    }
-                    int headerSize = header.getInt();
-                    long uncompressedSize = header.getLong();
-                    int blockSize = header.getInt();
-                    header.get();
-                    int align = header.get() & 0xFF;
-                    header.get();
-                    header.get();
-                    if (blockSize <= 0 || uncompressedSize <= 0 || headerSize < 0x18) {
-                        closeQuietly(fis);
-                        closeQuietly(pfd);
-                        return null;
-                    }
-                    int entryCount = (headerSize - 0x18) / 4;
-                    if (entryCount <= 1) {
-                        closeQuietly(fis);
-                        closeQuietly(pfd);
-                        return null;
-                    }
-                    int[] table = new int[entryCount];
-                    ByteBuffer indexBuffer = ByteBuffer.allocate(entryCount * 4).order(ByteOrder.LITTLE_ENDIAN);
-                    if (channel.read(indexBuffer) < entryCount * 4) {
-                        closeQuietly(fis);
-                        closeQuietly(pfd);
-                        return null;
-                    }
-                    indexBuffer.flip();
-                    for (int i = 0; i < entryCount; i++) {
-                        table[i] = indexBuffer.getInt();
-                    }
-                    return new CsoReader(pfd, fis, channel, uncompressedSize, blockSize, align, table);
-                } catch (Exception e) {
-                    closeQuietly(fis);
-                    closeQuietly(pfd);
-                    throw e;
-                }
-            }
-
-            byte[] readRange(long offset, int size) throws java.io.IOException {
-                if (size <= 0 || offset < 0 || offset >= uncompressedSize) {
-                    return null;
-                }
-                int cappedSize = (int)Math.min(size, uncompressedSize - offset);
-                byte[] output = new byte[cappedSize];
-                byte[] blockBuffer = new byte[blockSize];
-                int startBlock = (int)(offset / blockSize);
-                int endBlock = Math.min(blockCount, (int)Math.ceil((offset + cappedSize) / (double)blockSize));
-                int outOffset = 0;
-                int offsetInBlock = (int)(offset % blockSize);
-                long remaining = cappedSize;
-                for (int block = startBlock; block < endBlock && remaining > 0; block++) {
-                    int produced = readBlockInto(block, blockBuffer);
-                    if (produced <= 0) {
-                        break;
-                    }
-                    int start = (block == startBlock) ? offsetInBlock : 0;
-                    if (start >= produced) {
-                        continue;
-                    }
-                    int copyLength = (int)Math.min(produced - start, remaining);
-                    System.arraycopy(blockBuffer, start, output, outOffset, copyLength);
-                    outOffset += copyLength;
-                    remaining -= copyLength;
-                }
-                if (outOffset == 0) {
-                    return null;
-                }
-                if (outOffset < output.length) {
-                    return Arrays.copyOf(output, outOffset);
-                }
-                return output;
-            }
-
-            int readBlockInto(int blockIndex, byte[] dest) throws java.io.IOException {
-                if (blockIndex < 0 || blockIndex >= blockCount) {
-                    return -1;
-                }
-                long startOffset = (long)(indexTable[blockIndex] & 0x7FFFFFFFL) << alignShift;
-                long endOffset = (long)(indexTable[blockIndex + 1] & 0x7FFFFFFFL) << alignShift;
-                boolean isPlain = (indexTable[blockIndex] & 0x80000000) != 0;
-                int compressedSize = (int)Math.max(0, endOffset - startOffset);
-                int expectedSize = (int)Math.min(blockSize, uncompressedSize - ((long)blockIndex * blockSize));
-                if (expectedSize <= 0) {
-                    return 0;
-                }
-                if (compressedSize == 0) {
-                    Arrays.fill(dest, 0, expectedSize, (byte)0);
-                    return expectedSize;
-                }
-                byte[] compressed = new byte[compressedSize];
-                ByteBuffer buffer = ByteBuffer.wrap(compressed);
-                channel.position(startOffset);
-                int readTotal = 0;
-                while (buffer.hasRemaining()) {
-                    int r = channel.read(buffer);
-                    if (r <= 0) {
-                        break;
-                    }
-                    readTotal += r;
-                }
-                if (readTotal != compressedSize) {
-                    return -1;
-                }
-                if (isPlain) {
-                    int toCopy = Math.min(expectedSize, compressedSize);
-                    System.arraycopy(compressed, 0, dest, 0, toCopy);
-                    if (toCopy < expectedSize) {
-                        Arrays.fill(dest, toCopy, expectedSize, (byte)0);
-                    }
-                    return expectedSize;
-                }
-                Inflater inflater = new Inflater(true);
-                try {
-                    inflater.setInput(compressed);
-                    int total = 0;
-                    while (!inflater.finished() && total < expectedSize) {
-                        int r = inflater.inflate(dest, total, expectedSize - total);
-                        if (r <= 0) {
-                            if (inflater.needsInput() || inflater.finished()) {
-                                break;
-                            }
-                        } else {
-                            total += r;
-                        }
-                    }
-                    if (total <= 0) {
-                        Arrays.fill(dest, 0, expectedSize, (byte)0);
-                        return expectedSize;
-                    }
-                    return total;
-                } catch (Exception ignored) {
-                    return -1;
-                } finally {
-                    inflater.end();
-                }
-            }
-
-            int getBlockCount() {
-                return blockCount;
-            }
-
-            int getBlockSize() {
-                return blockSize;
-            }
-
-            long getUncompressedSize() {
-                return uncompressedSize;
-            }
-
-            @Override
-            public void close() throws java.io.IOException {
-                try {
-                    channel.close();
-                } finally {
-                    try {
-                        inputStream.close();
-                    } finally {
-                        descriptor.close();
-                    }
-                }
-            }
-        }
-
-        private static final class CsoInputStream extends java.io.InputStream {
-            private final CsoReader reader;
-            private final byte[] blockBuffer;
-            private int currentBlock = 0;
-            private int blockPos = 0;
-            private int blockLimit = 0;
-            private long bytesRemaining;
-
-            CsoInputStream(CsoReader reader) {
-                this.reader = reader;
-                this.blockBuffer = new byte[reader.getBlockSize()];
-                this.bytesRemaining = reader.getUncompressedSize();
-            }
-
-            @Override
-            public int read() throws java.io.IOException {
-                byte[] single = new byte[1];
-                int r = read(single, 0, 1);
-                if (r <= 0) {
-                    return -1;
-                }
-                return single[0] & 0xFF;
-            }
-
-            @Override
-            public int read(@NonNull byte[] b, int off, int len) throws java.io.IOException {
-                if (b == null) {
-                    throw new NullPointerException();
-                }
-                if (off < 0 || len < 0 || len > b.length - off) {
-                    throw new IndexOutOfBoundsException();
-                }
-                if (len == 0) {
-                    return 0;
-                }
-                if (bytesRemaining <= 0) {
-                    return -1;
-                }
-                int total = 0;
-                while (len > 0 && bytesRemaining > 0) {
-                    if (blockPos >= blockLimit) {
-                        if (currentBlock >= reader.getBlockCount()) {
-                            break;
-                        }
-                        blockLimit = reader.readBlockInto(currentBlock, blockBuffer);
-                        currentBlock++;
-                        blockPos = 0;
-                        if (blockLimit <= 0) {
-                            break;
-                        }
-                    }
-                    int available = blockLimit - blockPos;
-                    int copy = Math.min(len, available);
-                    copy = (int)Math.min(copy, bytesRemaining);
-                    if (copy <= 0) {
-                        break;
-                    }
-                    System.arraycopy(blockBuffer, blockPos, b, off, copy);
-                    off += copy;
-                    len -= copy;
-                    total += copy;
-                    blockPos += copy;
-                    bytesRemaining -= copy;
-                }
-                return total > 0 ? total : -1;
-            }
-
-            @Override
-            public void close() throws java.io.IOException {
-                reader.close();
-            }
-        }
-    }
-
     static class RedumpDB {
-        static class Result { String serial; String name; }
+        static class Result {
+        	String serial;
+        	String name;
+        }
         private static final Object LOCK = new Object();
-        private static java.util.Map<String, Result> sMd5SizeToResult = null; 
+        private static java.util.Map<String, Result> sMd5SizeToResult = null;
 
         private static String md5ToLower(String s) { return s != null ? s.trim().toLowerCase() : null; }
 
@@ -5114,9 +4650,12 @@ public class MainActivity extends AppCompatActivity {
                     if (f.exists()) {
                         in = new java.io.FileInputStream(f);
                     } else {
-                        try { in = ctx.getAssets().open("resources/RedumpDatabase.yaml"); }
-                        catch (Exception e) {
-                            try { DebugLog.w("Redump", "Database not found (assets and external)"); } catch (Throwable ignored) {}
+                        try {
+                            in = ctx.getAssets().open("resources/RedumpDatabase.yaml");
+                        } catch (Exception e) {
+                            try {
+                                DebugLog.w("Redump", "Database not found (assets and external)");
+                            } catch (Throwable ignored) { }
                             return;
                         }
                     }
@@ -5151,17 +4690,23 @@ public class MainActivity extends AppCompatActivity {
                         }
                         if (t.startsWith("- md5:")) {
                             int idx = t.indexOf(':');
-                            if (idx >= 0) { pendingMd5 = t.substring(idx + 1).trim(); }
+                            if (idx >= 0) {
+                                pendingMd5 = t.substring(idx + 1).trim();
+                            }
                             continue;
                         }
                         if (t.startsWith("md5:")) {
                             int idx = t.indexOf(':');
-                            if (idx >= 0) { pendingMd5 = t.substring(idx + 1).trim(); }
+                            if (idx >= 0) {
+                                pendingMd5 = t.substring(idx + 1).trim();
+                            }
                             continue;
                         }
                         if (t.startsWith("size:")) {
                             int idx = t.indexOf(':');
-                            if (idx >= 0) { pendingSize = t.substring(idx + 1).trim(); }
+                            if (idx >= 0) {
+                                pendingSize = t.substring(idx + 1).trim();
+                            }
                             if (pendingMd5 != null && pendingSize != null) {
                                 pendingHashes.add(new String[]{pendingMd5, pendingSize});
                                 pendingMd5 = null; pendingSize = null;
@@ -5192,11 +4737,19 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     pendingHashes.clear();
-                    try { DebugLog.i("Redump", "Loaded hash map entries: " + sMd5SizeToResult.size()); } catch (Throwable ignored) {}
+                    try {
+                        DebugLog.i("Redump", "Loaded hash map entries: " + sMd5SizeToResult.size());
+                    } catch (Throwable ignored) { }
                 } catch (Exception ex) {
-                    try { DebugLog.e("Redump", "Failed to load DB: " + ex.getMessage()); } catch (Throwable ignored) {}
+                    try {
+                        DebugLog.e("Redump", "Failed to load DB: " + ex.getMessage());
+                    } catch (Throwable ignored) { }
                 } finally {
-                    if (br != null) try { br.close(); } catch (Exception ignored) {}
+                    if (br != null) {
+                        try {
+                            br.close();
+                        } catch (Exception ignored) { }
+                    }
                 }
             }
         }
@@ -5231,418 +4784,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private android.graphics.Bitmap loadHeaderBitmapFromAssets() {
+    private Bitmap loadHeaderBitmapFromAssets() {
         try (java.io.InputStream is = getAssets().open("icon.png")) {
-            return android.graphics.BitmapFactory.decodeStream(is);
+            return BitmapFactory.decodeStream(is);
         } catch (Exception ignored) {
             try (java.io.InputStream is2 = getAssets().open("app_icons/icon.png")) {
-                return android.graphics.BitmapFactory.decodeStream(is2);
-            } catch (Exception ignored2) { return null; }
+                return BitmapFactory.decodeStream(is2);
+            } catch (Exception ignored2) {
+                return null;
+            }
         }
     }
 
-
-    private android.graphics.Bitmap loadHeaderBlurBitmapFromAssets() {
+    private Bitmap loadHeaderBlurBitmapFromAssets() {
         try (java.io.InputStream is = getAssets().open("app_icons/icon-old.png")) {
-            return android.graphics.BitmapFactory.decodeStream(is);
+            return BitmapFactory.decodeStream(is);
         } catch (Exception ignored) {
             try (java.io.InputStream is2 = getAssets().open("app_icons/icon.png")) {
-                return android.graphics.BitmapFactory.decodeStream(is2);
+                return BitmapFactory.decodeStream(is2);
             } catch (Exception ignored2) {
                 try (java.io.InputStream is3 = getAssets().open("icon.png")) {
-                    return android.graphics.BitmapFactory.decodeStream(is3);
-                } catch (Exception ignored3) { return null; }
+                    return BitmapFactory.decodeStream(is3);
+                } catch (Exception ignored3) {
+                    return null;
+                }
             }
         }
     }
-
-    // Recycler adapter
-    static class GamesAdapter extends RecyclerView.Adapter<GamesAdapter.VH> {
-        interface OnClick { void onClick(GameEntry e); }
-        static class VH extends RecyclerView.ViewHolder {
-            final TextView tv;
-            final android.widget.ImageView img;
-            final TextView tvOverlay;
-            VH(View v) {
-                super(v);
-                this.tv = v.findViewById(R.id.tv_title);
-                this.img = v.findViewById(R.id.img_cover);
-                this.tvOverlay = v.findViewById(R.id.tv_cover_fallback);
-            }
-        }
-        private final List<GameEntry> data;
-    private final List<GameEntry> filtered = new ArrayList<>();
-        private final OnClick onClick;
-        private boolean listMode = false;
-        // Lightweight in-memory cache for cover bitmaps
-        private static final android.util.LruCache<String, android.graphics.Bitmap> sCoverCache;
-        private static final java.util.Set<String> sNegativeCache = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
-        private static final java.util.concurrent.ExecutorService sExec = java.util.concurrent.Executors.newFixedThreadPool(3);
-        private static final java.util.Map<String, File> sLocalCoverFiles = java.util.Collections.synchronizedMap(new java.util.HashMap<>());
-        private static final java.util.Set<String> sLocalCoverMissing = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
-        static {
-            int maxMem = (int) (Runtime.getRuntime().maxMemory() / 1024);
-            int cacheSize = Math.max(1024 * 8, Math.min(1024 * 64, maxMem / 16)); 
-            sCoverCache = new android.util.LruCache<String, android.graphics.Bitmap>(cacheSize) {
-                @Override protected int sizeOf(String key, android.graphics.Bitmap value) {
-                    return value.getByteCount() / 1024;
-                }
-            };
-        }
-        static void clearLocalCoverCache() {
-            sLocalCoverFiles.clear();
-            sLocalCoverMissing.clear();
-        }
-
-        static void registerCachedCover(GameEntry entry, File file) {
-            if (entry == null || file == null || !file.exists()) {
-                return;
-            }
-            String key = coverKey(entry);
-            if (TextUtils.isEmpty(key)) {
-                return;
-            }
-            sLocalCoverFiles.put(key, file);
-            sLocalCoverMissing.remove(key);
-        }
-    GamesAdapter(List<GameEntry> d, OnClick oc) { data = d; filtered.addAll(d); onClick = oc; setHasStableIds(true); }
-        void update(List<GameEntry> d) { clearLocalCoverCache(); data.clear(); data.addAll(d); applyFilter(currentFilter); }
-        int getItemCountTotal() { return data.size(); }
-        private String currentFilter = "";
-        void setFilter(String q) { currentFilter = q == null ? "" : q.trim(); applyFilter(currentFilter); }
-        private void applyFilter(String q) {
-            filtered.clear();
-            if (TextUtils.isEmpty(q)) {
-                filtered.addAll(data);
-            } else {
-                String needle = q.toLowerCase();
-                for (GameEntry e : data) {
-                    String t = e != null && e.title != null ? e.title.toLowerCase() : "";
-                    String s = e != null && e.serial != null ? e.serial.toLowerCase() : "";
-                    if (t.contains(needle) || s.contains(needle)) filtered.add(e);
-                }
-            }
-            notifyDataSetChanged();
-        }
-        void setListMode(boolean list) { this.listMode = list; notifyDataSetChanged(); }
-        @Override public int getItemViewType(int position) { return listMode ? 1 : 0; }
-        @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            int layout = (viewType == 1) ? R.layout.item_game_list : R.layout.item_game;
-            View v = getLayoutInflater(parent).inflate(layout, parent, false);
-            return new VH(v);
-        }
-        @Override public long getItemId(int position) {
-            try {
-                GameEntry e = data.get(position);
-                String key = (e.uri != null ? e.uri.toString() : e.title) + "|" + (e.title != null ? e.title : "");
-                return (long) key.hashCode();
-            } catch (Throwable ignored) { return position; }
-        }
-        @Override public void onViewRecycled(@NonNull VH holder) {
-            super.onViewRecycled(holder);
-            try {
-                holder.img.setTag(R.id.tag_request_key, null);
-                holder.img.setImageDrawable(null);
-            } catch (Throwable ignored) {}
-        }
-        @Override public void onBindViewHolder(@NonNull VH holder, int position) {
-            GameEntry e = filtered.get(position);
-            String tpl = ((MainActivity)holder.itemView.getContext()).getCoversUrlTemplate();
-            boolean loaded = false;
-            try { holder.img.setImageDrawable(null); } catch (Throwable ignored) {}
-            try { holder.img.setBackgroundColor(android.graphics.Color.TRANSPARENT); } catch (Throwable ignored) {}
-            if (holder.tvOverlay != null) holder.tvOverlay.setVisibility(View.GONE);
-            try {
-                String gameKey = gameKeyFromEntry(e);
-                String manual = ((MainActivity)holder.itemView.getContext()).getManualCoverUri(gameKey);
-                if (manual != null && !manual.isEmpty()) {
-                    android.net.Uri mu = android.net.Uri.parse(manual);
-                    try (java.io.InputStream is = holder.itemView.getContext().getContentResolver().openInputStream(mu)) {
-                        if (is != null) {
-                            android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeStream(is);
-                            if (bmp != null) {
-                                holder.img.setImageBitmap(bmp);
-                                loaded = true;
-                            }
-                        }
-                    } catch (Throwable ignored) {}
-                }
-            } catch (Throwable ignored) {}
-            if (!loaded) {
-                File cachedLocal = findCachedCoverFile(holder.itemView.getContext(), e);
-                if (cachedLocal != null && cachedLocal.exists()) {
-                    String localKey = cachedLocal.getAbsolutePath();
-                    android.graphics.Bitmap cachedBmp = sCoverCache.get(localKey);
-                    if (cachedBmp != null) {
-                        holder.img.setImageBitmap(cachedBmp);
-                        loaded = true;
-                    } else {
-                        android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeFile(localKey);
-                        if (bmp != null) {
-                            holder.img.setImageBitmap(bmp);
-                            sCoverCache.put(localKey, bmp);
-                            loaded = true;
-                        }
-                    }
-                }
-            }
-            boolean online = MainActivity.hasInternetConnection(holder.itemView.getContext());
-            if (!loaded && online && tpl != null && !tpl.isEmpty()) {
-                java.util.List<String> urls = MainActivity.buildCoverCandidateUrls(e, tpl);
-                String requestKey = (e.uri != null ? e.uri.toString() : e.title) + "|" + (e.serial != null ? e.serial : "") + "|" + (e.title != null ? e.title : "");
-                holder.img.setTag(R.id.tag_request_key, requestKey);
-                for (String u : urls) {
-                    if (u == null || u.isEmpty() || u.contains("${")) continue;
-                    android.graphics.Bitmap cached = sCoverCache.get(u);
-                    if (cached != null) {
-                        loaded = true;
-                        holder.img.setImageBitmap(cached);
-                        break;
-                    }
-                }
-                if (!loaded && !urls.isEmpty())
-                    loadImageWithFallback(holder.img, holder.tvOverlay, holder.itemView.getContext(), e, urls, requestKey);
-            }
-            holder.img.setVisibility(View.VISIBLE);
-            if (listMode) {
-                holder.tv.setVisibility(View.VISIBLE);
-                holder.tv.setText(e.gameTitle != null ? e.gameTitle : e.title);
-                if (holder.tvOverlay != null) holder.tvOverlay.setVisibility(View.GONE);
-            } else {
-                if (loaded) {
-                    if (holder.tvOverlay != null) holder.tvOverlay.setVisibility(View.GONE);
-                    holder.tv.setVisibility(View.GONE);
-                } else {
-                    holder.tv.setVisibility(View.GONE);
-                    if (holder.tvOverlay != null) {
-                        holder.tvOverlay.setText(e.gameTitle != null ? e.gameTitle : e.title);
-                        holder.tvOverlay.setVisibility(View.VISIBLE);
-                        holder.tvOverlay.bringToFront();
-                    }
-                }
-            }
-            holder.itemView.setOnClickListener(v -> onClick.onClick(e));
-            holder.itemView.setOnKeyListener((v, keyCode, event) -> {
-                if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
-                RecyclerView rv = (RecyclerView) holder.itemView.getParent();
-                RecyclerView.LayoutManager lm = rv.getLayoutManager();
-                if (!(lm instanceof GridLayoutManager)) return false;
-                int span = ((GridLayoutManager) lm).getSpanCount();
-                int pos = holder.getAdapterPosition();
-                if (pos == RecyclerView.NO_POSITION) return false;
-                switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_LEFT:
-                        if (pos % span > 0) {
-                            int target = pos - 1;
-                            rv.smoothScrollToPosition(target);
-                            rv.post(() -> {
-                                RecyclerView.ViewHolder tvh = rv.findViewHolderForAdapterPosition(target);
-                                if (tvh != null) tvh.itemView.requestFocus();
-                            });
-                        }
-                        return true;
-                    case KeyEvent.KEYCODE_DPAD_RIGHT:
-                        if (pos + 1 < getItemCount()) {
-                            int target = pos + 1;
-                            rv.smoothScrollToPosition(target);
-                            rv.post(() -> {
-                                RecyclerView.ViewHolder tvh = rv.findViewHolderForAdapterPosition(target);
-                                if (tvh != null) tvh.itemView.requestFocus();
-                            });
-                        }
-                        return true;
-                    case KeyEvent.KEYCODE_DPAD_UP:
-                        if (pos - span >= 0) {
-                            int target = pos - span;
-                            rv.smoothScrollToPosition(target);
-                            rv.post(() -> {
-                                RecyclerView.ViewHolder tvh = rv.findViewHolderForAdapterPosition(target);
-                                if (tvh != null) tvh.itemView.requestFocus();
-                            });
-                        }
-                        return true;
-                    case KeyEvent.KEYCODE_DPAD_DOWN:
-                        if (pos + span < getItemCount()) {
-                            int target = pos + span;
-                            rv.smoothScrollToPosition(target);
-                            rv.post(() -> {
-                                RecyclerView.ViewHolder tvh = rv.findViewHolderForAdapterPosition(target);
-                                if (tvh != null) tvh.itemView.requestFocus();
-                            });
-                        }
-                        return true;
-                    case KeyEvent.KEYCODE_BUTTON_A:
-                    case KeyEvent.KEYCODE_BUTTON_START:
-                    case KeyEvent.KEYCODE_ENTER:
-                        v.performClick();
-                        return true;
-                }
-                return false;
-            });
-            holder.itemView.setOnLongClickListener(v -> {
-                try { ((MainActivity)holder.itemView.getContext()).promptChooseManualCover(e); } catch (Throwable ignored) {}
-                return true;
-            });
-        }
-    @Override public int getItemCount() { return filtered.size(); }
-        private static android.view.LayoutInflater getLayoutInflater(ViewGroup parent) {
-            return android.view.LayoutInflater.from(parent.getContext());
-        }
-
-        private void loadImageWithFallback(android.widget.ImageView iv, TextView overlayView, Context ctx, GameEntry entry, java.util.List<String> urls, String requestKey) {
-            try {
-                sExec.execute(() -> {
-                    try {
-                        android.graphics.Bitmap bmp = null;
-                        String hitUrl = null;
-                        byte[] downloadedBytes = null;
-                        String downloadExtension = null;
-                        for (String ustr : urls) {
-                            if (ustr == null || ustr.isEmpty() || ustr.contains("${")) continue;
-                            Object tag = iv.getTag(R.id.tag_request_key);
-                            if (!(requestKey.equals(tag))) { break; }
-                            if (sNegativeCache.contains(ustr)) continue;
-                            android.graphics.Bitmap cached = sCoverCache.get(ustr);
-                            if (cached != null) { bmp = cached; hitUrl = ustr; break; }
-                            try {
-                                java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(ustr).openConnection();
-                                c.setConnectTimeout(4000); c.setReadTimeout(6000);
-                                c.setInstanceFollowRedirects(true);
-                                c.setRequestMethod("GET");
-                                int code = c.getResponseCode();
-                                if (code == 200) {
-                                    try (java.io.InputStream is = c.getInputStream();
-                                         java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
-                                        byte[] buffer = new byte[8192];
-                                        int read;
-                                        while ((read = is.read(buffer)) != -1) {
-                                            baos.write(buffer, 0, read);
-                                        }
-                                        byte[] data = baos.toByteArray();
-                                        if (data.length > 0) {
-                                            android.graphics.Bitmap candidate = android.graphics.BitmapFactory.decodeByteArray(data, 0, data.length);
-                                            if (candidate != null) {
-                                                bmp = candidate;
-                                                downloadedBytes = data;
-                                                downloadExtension = guessImageExtension(ustr, c.getContentType());
-                                                hitUrl = ustr;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                } else if (code == 404) {
-                                    sNegativeCache.add(ustr);
-                                    continue; 
-                                } else {
-                                    try { DebugLog.d("Covers", "HTTP " + code + " for " + ustr); } catch (Throwable ignored) {}
-                                }
-                            } catch (Exception ex) {
-                                try { DebugLog.d("Covers", "Error loading cover: " + ex.getMessage()); } catch (Throwable ignored) {}
-                            }
-                        }
-                        if (downloadedBytes != null && downloadedBytes.length > 0 && entry != null && ctx != null) {
-                            try { storeCoverBytes(ctx, entry, downloadedBytes, downloadExtension); } catch (Throwable ignored) {}
-                        }
-                        final android.graphics.Bitmap fb = bmp;
-                        final String fUrl = hitUrl;
-                        iv.post(() -> {
-                            Object tagNow = iv.getTag(R.id.tag_request_key);
-                            if (requestKey.equals(tagNow) && fb != null) {
-                                iv.setImageBitmap(fb);
-                                if (fUrl != null) sCoverCache.put(fUrl, fb);
-                                if (overlayView != null) overlayView.setVisibility(View.GONE);
-                            }
-                        });
-                    } catch (Throwable ignored) {}
-                });
-            } catch (Throwable ignored) {}
-        }
-
-        private File findCachedCoverFile(Context ctx, GameEntry entry) {
-            if (ctx == null || entry == null || entry.uri == null) {
-                return null;
-            }
-            String key = coverKey(entry);
-            if (TextUtils.isEmpty(key)) {
-                return null;
-            }
-            File cached = sLocalCoverFiles.get(key);
-            if (cached != null && cached.exists()) {
-                return cached;
-            }
-            if (sLocalCoverMissing.contains(key)) {
-                return null;
-            }
-            File cacheDir = MainActivity.getCoversCacheDir(ctx);
-            if (cacheDir == null) {
-                sLocalCoverMissing.add(key);
-                return null;
-            }
-            String baseName = computeCoverBaseName(entry);
-            File coverFile = MainActivity.findExistingCoverFile(cacheDir, baseName);
-            if (coverFile != null && coverFile.isFile() && coverFile.length() > 0) {
-                sLocalCoverFiles.put(key, coverFile);
-                sLocalCoverMissing.remove(key);
-                return coverFile;
-            }
-            sLocalCoverMissing.add(key);
-            return null;
-        }
-
-        private static void storeCoverBytes(Context ctx, GameEntry entry, byte[] data, String extension) {
-            if (ctx == null || entry == null || data == null || data.length == 0) {
-                return;
-            }
-            File cacheDir = MainActivity.getCoversCacheDir(ctx);
-            if (cacheDir == null) {
-                return;
-            }
-            String baseName = computeCoverBaseName(entry);
-            if (TextUtils.isEmpty(baseName)) {
-                return;
-            }
-            String ext = extension;
-            if (TextUtils.isEmpty(ext)) {
-                ext = ".jpg";
-            }
-            if (!ext.startsWith(".")) {
-                ext = "." + ext;
-            }
-            File target = new File(cacheDir, baseName + ext);
-            File parent = target.getParentFile();
-            if (parent != null && !parent.exists() && !parent.mkdirs()) {
-                return;
-            }
-            File temp = new File(cacheDir, baseName + "_tmp" + ext);
-            try (FileOutputStream fos = new FileOutputStream(temp)) {
-                fos.write(data);
-                fos.flush();
-            } catch (IOException ignored) {
-                temp.delete();
-                return;
-            }
-            if (!temp.renameTo(target)) {
-                temp.delete();
-                return;
-            }
-            GamesAdapter.registerCachedCover(entry, target);
-            try { DebugLog.d("Covers", "Stored cover cache file: " + target.getAbsolutePath()); } catch (Throwable ignored) {}
-        }
-
-        private static String coverKey(GameEntry entry) {
-            if (entry == null) {
-                return null;
-            }
-            if (entry.uri != null) {
-                return entry.uri.toString();
-            }
-            String fallback = entry.title;
-            if (TextUtils.isEmpty(fallback)) {
-                fallback = entry.fileTitleNoExt();
-            }
-            return fallback;
-        }
-
-    }
-
 }

@@ -23,6 +23,7 @@ package kr.co.iefriends.pcsx2;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -30,7 +31,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import android.graphics.drawable.Drawable;
 import androidx.annotation.Nullable;
 
 /**
@@ -176,24 +176,24 @@ public class DPadView extends View {
         float armLength = size * 0.35f;
         
         // Up region
-        upRegion.set(centerX - armWidth/2, bounds.top, 
-                    centerX + armWidth/2, centerY - armWidth/2);
+        upRegion.set(centerX - armWidth / 2, bounds.top, 
+                    centerX + armWidth / 2, centerY - armWidth / 2);
         
         // Down region  
-        downRegion.set(centerX - armWidth/2, centerY + armWidth/2,
-                      centerX + armWidth/2, bounds.bottom);
+        downRegion.set(centerX - armWidth / 2, centerY + armWidth / 2,
+                      centerX + armWidth / 2, bounds.bottom);
         
         // Left region
-        leftRegion.set(bounds.left, centerY - armWidth/2,
-                      centerX - armWidth/2, centerY + armWidth/2);
+        leftRegion.set(bounds.left, centerY - armWidth / 2,
+                      centerX - armWidth / 2, centerY + armWidth / 2);
         
         // Right region
-        rightRegion.set(centerX + armWidth/2, centerY - armWidth/2,
-                       bounds.right, centerY + armWidth/2);
+        rightRegion.set(centerX + armWidth / 2, centerY - armWidth / 2,
+                       bounds.right, centerY + armWidth / 2);
         
         // Center region
-        centerRegion.set(centerX - armWidth/2, centerY - armWidth/2,
-                        centerX + armWidth/2, centerY + armWidth/2);
+        centerRegion.set(centerX - armWidth / 2, centerY - armWidth / 2,
+                        centerX + armWidth / 2, centerY + armWidth / 2);
         updateDrawableBounds();
     }
     
@@ -205,18 +205,18 @@ public class DPadView extends View {
         float armWidth = bounds.width() * 0.3f;
         float armLength = bounds.width() * 0.35f;
         
-        dpadPath.moveTo(centerX - armWidth/2, bounds.top);
-        dpadPath.lineTo(centerX + armWidth/2, bounds.top);
-        dpadPath.lineTo(centerX + armWidth/2, centerY - armWidth/2);
-        dpadPath.lineTo(bounds.right, centerY - armWidth/2);
-        dpadPath.lineTo(bounds.right, centerY + armWidth/2);
-        dpadPath.lineTo(centerX + armWidth/2, centerY + armWidth/2);
-        dpadPath.lineTo(centerX + armWidth/2, bounds.bottom);
-        dpadPath.lineTo(centerX - armWidth/2, bounds.bottom);
-        dpadPath.lineTo(centerX - armWidth/2, centerY + armWidth/2);
-        dpadPath.lineTo(bounds.left, centerY + armWidth/2);
-        dpadPath.lineTo(bounds.left, centerY - armWidth/2);
-        dpadPath.lineTo(centerX - armWidth/2, centerY - armWidth/2);
+        dpadPath.moveTo(centerX - armWidth / 2, bounds.top);
+        dpadPath.lineTo(centerX + armWidth / 2, bounds.top);
+        dpadPath.lineTo(centerX + armWidth / 2, centerY - armWidth / 2);
+        dpadPath.lineTo(bounds.right, centerY - armWidth / 2);
+        dpadPath.lineTo(bounds.right, centerY + armWidth / 2);
+        dpadPath.lineTo(centerX + armWidth / 2, centerY + armWidth / 2);
+        dpadPath.lineTo(centerX + armWidth / 2, bounds.bottom);
+        dpadPath.lineTo(centerX - armWidth / 2, bounds.bottom);
+        dpadPath.lineTo(centerX - armWidth / 2, centerY + armWidth / 2);
+        dpadPath.lineTo(bounds.left, centerY + armWidth / 2);
+        dpadPath.lineTo(bounds.left, centerY - armWidth / 2);
+        dpadPath.lineTo(centerX - armWidth / 2, centerY - armWidth / 2);
         dpadPath.close();
     }
     

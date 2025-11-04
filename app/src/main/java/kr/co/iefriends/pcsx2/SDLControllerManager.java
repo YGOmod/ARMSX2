@@ -16,8 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class SDLControllerManager
-{
+public class SDLControllerManager {
 
     static native int nativeSetupJNI();
 
@@ -96,8 +95,7 @@ public class SDLControllerManager
     /**
      * This method is called by SDL using JNI.
      */
-    static void hapticStop(int device_id)
-    {
+    static void hapticStop(int device_id) {
         mHapticHandler.stop(device_id);
     }
 
@@ -124,9 +122,9 @@ public class SDLControllerManager
         }
         */
 
-        return ((sources & InputDevice.SOURCE_CLASS_JOYSTICK) != 0 ||
-                ((sources & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD) ||
-                ((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD)
+        return ((sources & InputDevice.SOURCE_CLASS_JOYSTICK) != 0
+                || ((sources & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD)
+                || ((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD)
         );
     }
 
@@ -254,7 +252,7 @@ class SDLJoystickHandler_API16 extends SDLJoystickHandler {
                     mJoysticks.add(joystick);
                     SDLControllerManager.nativeAddJoystick(joystick.device_id, joystick.name, joystick.desc,
                             getVendorId(joystickDevice), getProductId(joystickDevice),
-                            getButtonMask(joystickDevice), joystick.axes.size(), getAxisMask(joystick.axes), joystick.hats.size()/2, can_rumble);
+                            getButtonMask(joystickDevice), joystick.axes.size(), getAxisMask(joystick.axes), joystick.hats.size() / 2, can_rumble);
                 }
             }
         }
@@ -531,8 +529,7 @@ class SDLHapticHandler_API31 extends SDLHapticHandler {
         }
         try {
             vibrator.vibrate(VibrationEffect.createOneShot(length, value));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // Fall back to the generic method, which uses DEFAULT_AMPLITUDE, but works even if
             // something went horribly wrong with the Android 8.0 APIs.
             vibrator.vibrate(length);
@@ -561,8 +558,7 @@ class SDLHapticHandler_API26 extends SDLHapticHandler {
             }
             try {
                 haptic.vib.vibrate(VibrationEffect.createOneShot(length, vibeValue));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // Fall back to the generic method, which uses DEFAULT_AMPLITUDE, but works even if
                 // something went horribly wrong with the Android 8.0 APIs.
                 haptic.vib.vibrate(length);
@@ -665,9 +661,9 @@ class SDLGenericMotionListener_API14 implements View.OnGenericMotionListener {
     // Generic Motion (mouse hover, joystick...) events go here
     @Override
     public boolean onGenericMotion(View v, MotionEvent event) {
-        if (event.getSource() == InputDevice.SOURCE_JOYSTICK)
+        if (event.getSource() == InputDevice.SOURCE_JOYSTICK) {
             return SDLControllerManager.handleJoystickMotionEvent(event);
-
+        }
         return false;
     }
 

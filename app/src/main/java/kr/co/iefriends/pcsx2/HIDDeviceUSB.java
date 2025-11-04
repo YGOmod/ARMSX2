@@ -60,8 +60,7 @@ class HIDDeviceUSB implements HIDDevice {
         if (Build.VERSION.SDK_INT >= 21 /* Android 5.0 (LOLLIPOP) */) {
             try {
                 result = mDevice.getSerialNumber();
-            }
-            catch (SecurityException exception) {
+            } catch (SecurityException exception) {
                 //Log.w(TAG, "App permissions mean we cannot get serial number for device " + getDeviceName() + " message: " + exception.getMessage());
             }
         }
@@ -130,15 +129,15 @@ class HIDDeviceUSB implements HIDDevice {
             UsbEndpoint endpt = iface.getEndpoint(j);
             switch (endpt.getDirection()) {
             case UsbConstants.USB_DIR_IN:
-                if (mInputEndpoint == null) {
-                    mInputEndpoint = endpt;
-                }
-                break;
+                    if (mInputEndpoint == null) {
+                        mInputEndpoint = endpt;
+                    }
+                    break;
             case UsbConstants.USB_DIR_OUT:
-                if (mOutputEndpoint == null) {
-                    mOutputEndpoint = endpt;
-                }
-                break;
+                    if (mOutputEndpoint == null) {
+                        mOutputEndpoint = endpt;
+                    }
+                    break;
             }
         }
 
@@ -293,12 +292,9 @@ class HIDDeviceUSB implements HIDDevice {
             byte[] packet = new byte[packetSize];
             while (mRunning) {
                 int r;
-                try
-                {
+                try {
                     r = mConnection.bulkTransfer(mInputEndpoint, packet, packetSize, 1000);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     Log.v(TAG, "Exception in UsbDeviceConnection bulktransfer: " + e);
                     break;
                 }

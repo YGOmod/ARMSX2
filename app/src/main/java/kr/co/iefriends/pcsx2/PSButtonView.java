@@ -139,8 +139,8 @@ public class PSButtonView extends View {
         squarePaint.setStrokeWidth(size * 0.15f);
         
         RectF square = new RectF(
-            centerX - size, centerY - size,
-            centerX + size, centerY + size
+                centerX - size, centerY - size,
+                centerX + size, centerY + size
         );
         canvas.drawRect(square, squarePaint);
     }

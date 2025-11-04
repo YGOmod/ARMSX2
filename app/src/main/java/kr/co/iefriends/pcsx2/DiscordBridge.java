@@ -32,14 +32,14 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -156,8 +156,7 @@ final class DiscordBridge {
 
     private static native void nativeSetAppForeground(boolean isForeground);
 
-    private DiscordBridge() {
-    }
+    private DiscordBridge() { }
 
     static boolean isAvailable() {
         return sSdkAvailable && sApplicationId != 0L;
@@ -536,8 +535,8 @@ final class DiscordBridge {
         SharedPreferences prefs = sAppContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         final String accessToken = prefs.getString(KEY_ACCESS_TOKEN, null);
         final String tokenType = prefs.getString(KEY_TOKEN_TYPE, "Bearer");
-        if (TextUtils.isEmpty(accessToken) || TextUtils.isEmpty(tokenType) ||
-                !"Bearer".equalsIgnoreCase(tokenType)) {
+        if (TextUtils.isEmpty(accessToken) || TextUtils.isEmpty(tokenType)
+                || !"Bearer".equalsIgnoreCase(tokenType)) {
             return;
         }
         synchronized (DiscordBridge.class) {

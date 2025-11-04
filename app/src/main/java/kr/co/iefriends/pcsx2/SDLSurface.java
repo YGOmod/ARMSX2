@@ -38,7 +38,7 @@ public class SDLSurface extends SurfaceView implements SurfaceHolder.Callback {
         NativeApp.onNativeSurfaceChanged(p_holder.getSurface(), p_width, p_height);
         ////
         MainActivity _nativeActivity = (MainActivity) getContext();
-        if(_nativeActivity != null) {
+        if (_nativeActivity != null) {
             _nativeActivity.onSurfaceReady();
         }
     }

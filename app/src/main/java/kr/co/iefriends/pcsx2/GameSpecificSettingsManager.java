@@ -5,9 +5,6 @@ import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -17,6 +14,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 final class GameSpecificSettingsManager {
     private static final String FILE_NAME = "IGS.json";
     private static final String KEY_VERSION = "version";
@@ -24,8 +24,7 @@ final class GameSpecificSettingsManager {
     private static final int CURRENT_VERSION = 1;
     private static final Object LOCK = new Object();
 
-    private GameSpecificSettingsManager() {
-    }
+    private GameSpecificSettingsManager() { }
 
     static final class GameSettings {
         @Nullable Boolean enableCheats;

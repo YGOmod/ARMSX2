@@ -2,8 +2,7 @@ package kr.co.iefriends.pcsx2;
 
 import android.hardware.usb.UsbDevice;
 
-interface HIDDevice
-{
+interface HIDDevice {
     public int getId();
     public int getVendorId();
     public int getProductId();
