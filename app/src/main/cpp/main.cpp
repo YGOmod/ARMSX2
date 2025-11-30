@@ -37,22 +37,22 @@ namespace
 {
 	static jclass s_native_app_class = nullptr;
 	static jmethodID s_on_pad_vibration = nullptr;
-    static jmethodID s_native_ensure_resource_dir = nullptr;
+	static jmethodID s_native_ensure_resource_dir = nullptr;
 
 	static jclass s_ra_bridge_class = nullptr;
 	static jmethodID s_ra_notify_login_requested = nullptr;
 	static jmethodID s_ra_notify_login_success = nullptr;
 	static jmethodID s_ra_notify_state_changed = nullptr;
 	static jmethodID s_ra_notify_hardcore_changed = nullptr;
-        static std::mutex s_ra_bridge_mutex;
+	static std::mutex s_ra_bridge_mutex;
 
 	static void EnsureAchievementsClientInitialized()
 	{
-        if (!EmuConfig.Achievements.Enabled)
-            return;
+		if (!EmuConfig.Achievements.Enabled)
+			return;
 
-        if (!Achievements::IsActive())
-            Achievements::Initialize();
+		if (!Achievements::IsActive())
+			Achievements::Initialize();
 	}
 
 	static void ClearJNIExceptions(JNIEnv* env)
@@ -64,10 +64,10 @@ namespace
 		}
 	}
 
-    static bool EnsureNativeAppMethods(JNIEnv* env)
-    {
-        if (!env)
-            return false;
+	static bool EnsureNativeAppMethods(JNIEnv* env)
+	{
+		if (!env)
+			return false;
 
         if (!s_native_app_class)
         {
@@ -103,8 +103,8 @@ namespace
 		if (!env)
 			return false;
 
-        std::lock_guard<std::mutex> lock(s_ra_bridge_mutex);
-        if (!s_ra_bridge_class)
+		std::lock_guard<std::mutex> lock(s_ra_bridge_mutex);
+		if (!s_ra_bridge_class)
 		{
 			jclass local = env->FindClass("kr/co/iefriends/pcsx2/utils/RetroAchievementsBridge");
 			if (!local)
@@ -136,9 +136,9 @@ namespace
 	}
 	static void NotifyRetroAchievementsState()
 	{
-        auto* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
-        if (!env)
-            return;
+		auto* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
+		if (!env)
+			return;
 		if (!EnsureRetroAchievementsBridge(env))
 			return;
 
@@ -760,14 +760,15 @@ Java_kr_co_iefriends_pcsx2_NativeApp_renderGpu(JNIEnv *env, jclass clazz,
     EmuConfig.GS.Renderer = static_cast<GSRendererType>(p_value);
     GSConfig.Renderer = static_cast<GSRendererType>(p_value);
 
-    VMManager::ApplySettings();
-    if (MTGS::IsOpen())
-        MTGS::ApplySettings();
     if (s_settings_interface)
     {
         s_settings_interface->SetIntValue("EmuCore/GS", "Renderer", static_cast<int>(p_value));
         s_settings_interface->Save();
     }
+
+    VMManager::ApplySettings();
+    if (MTGS::IsOpen())
+        MTGS::ApplySettings();
 }
 
 extern "C"
@@ -874,13 +875,13 @@ Java_kr_co_iefriends_pcsx2_NativeApp_setSetting(JNIEnv* env, jclass, jstring j_s
     {
         si.SetStringValue(section.c_str(), key.c_str(), value.c_str());
     }
+    si.Save();
 
     // Apply live where it makes sense
     VMManager::ApplySettings();
     if (MTGS::IsOpen()) {
         MTGS::ApplySettings();
     }
-    si.Save();
 }
 
 extern "C"
