@@ -4791,7 +4791,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (ge != null && (ge.serial == null || ge.serial.isEmpty())) {
                     String name = ge.title != null ? ge.title.toLowerCase() : "";
-                    if (name.endsWith(".iso") || name.endsWith(".img") || name.endsWith(".bin"))
+                    if (name.endsWith(".iso") || name.endsWith(".img") || name.endsWith(".bin") || name.endsWith(".chd"))
                         toResolve.add(ge);
                 }
             } catch (Throwable ignored) {}
