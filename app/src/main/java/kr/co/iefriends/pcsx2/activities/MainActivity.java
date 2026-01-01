@@ -5182,6 +5182,14 @@ public class MainActivity extends AppCompatActivity {
                             try { DebugLog.d("BIN", "Quick serial scan failed: " + t.getMessage()); } catch (Throwable ignored) {}
                         }
                     }
+                    if (e.serial == null && lowerName.endsWith(".chd")) {
+                        try {
+                            String chdSerial = tryExtractChdSerial(cr, doc);
+                            if (chdSerial != null) e.serial = chdSerial;
+                        } catch (Throwable t) {
+                            try { DebugLog.d("CHD", "Serial parse failed: " + t.getMessage()); } catch (Throwable ignored) {}
+                        }
+                    }
                     out.add(e);
                 }
             } catch (Exception ignored) {}
@@ -5326,6 +5334,93 @@ public class MainActivity extends AppCompatActivity {
             }
             String s2 = parseSerialFromString(txt);
             return s2;
+        }
+
+        static String tryExtractChdSerial(android.content.ContentResolver cr, Uri uri) throws java.io.IOException {
+            try {
+                ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
+                if (pfd == null) return null;
+
+                FileInputStream fis = new FileInputStream(pfd.getFileDescriptor());
+                FileChannel channel = fis.getChannel();
+
+                // Read CHD v5 header
+                ByteBuffer header = ByteBuffer.allocate(124).order(ByteOrder.BIG_ENDIAN);
+                if (channel.read(header) < 124) {
+                    fis.close();
+                    pfd.close();
+                    return null;
+                }
+
+                header.flip();
+                long magic = header.getLong();
+
+                // Check CHD magic "MComprHD"
+                if (magic != 0x4D436F6D7048440AL) {
+                    fis.close();
+                    pfd.close();
+                    return null;
+                }
+
+                header.getInt(); // headerSize
+                int version = header.getInt();
+
+                if (version != 5) {
+                    fis.close();
+                    pfd.close();
+                    return null;
+                }
+
+                // Skip to metadata offset
+                header.position(48); // Skip compressors
+                long logicalBytes = header.getLong();
+                long mapOffset = header.getLong();
+                long metaOffset = header.getLong();
+        
+                if (metaOffset == 0) {
+                    fis.close();
+                    pfd.close();
+                    return null;
+                }
+
+                // Find GDDD
+                channel.position(metaOffset);
+
+                while (true) {
+                    ByteBuffer metaEntry = ByteBuffer.allocate(16).order(ByteOrder.BIG_ENDIAN);
+                    if (channel.read(metaEntry) < 16) break;
+
+                    metaEntry.flip();
+                    int metaTag = metaEntry.getInt();
+                    int metaLength = metaEntry.getInt();
+                    long metaNext = metaEntry.getLong();
+
+                    // GDDD = 0x47444444
+                    if (metaTag == 0x47444444 && metaLength > 0 && metaLength < 1024) {
+                        byte[] metaData = new byte[metaLength];
+                        ByteBuffer dataBuf = ByteBuffer.wrap(metaData);
+                        if (channel.read(dataBuf) == metaLength) {
+                            String gdddString = new String(metaData, java.nio.charset.StandardCharsets.US_ASCII);
+                            String serial = parseSerialFromString(gdddString);
+                            if (serial != null) {
+                                fis.close();
+                                pfd.close();
+                                return serial;
+                            }
+                        }
+                    }
+
+                    if (metaNext == 0) break;
+                    channel.position(metaNext);
+                }
+
+                fis.close();
+                pfd.close();
+                return null;
+
+            } catch (Exception e) {
+                return null;
+            }
         }
 
         private static int u8(byte[] a, int i) { return (i >= 0 && i < a.length) ? (a[i] & 0xFF) : 0; }
