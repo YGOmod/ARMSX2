@@ -3167,8 +3167,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void importCheatFile(Uri uri) {
         if (uri == null) {
-            return;
+        	return;
         }
+    
         new Thread(() -> {
             boolean success = false;
             String targetName = null;
@@ -3180,34 +3181,73 @@ public class MainActivity extends AppCompatActivity {
                 File cheatsDir = new File(dataRoot, "cheats");
                 if (!cheatsDir.exists() && !cheatsDir.mkdirs()) {
                     errorReason = "Unable to create cheats directory: " + cheatsDir;
-                    try { DebugLog.e("Cheats", errorReason); } catch (Throwable ignored) {}
+                    try {
+                        DebugLog.e("Cheats", errorReason);
+                    } catch (Throwable ignored) {}
                 } else {
                     String displayName = getDisplayNameForUri(uri);
-                    if (TextUtils.isEmpty(displayName)) {
-                        displayName = "custom_cheats.pnach";
-                    }
-                    if (!displayName.toLowerCase(Locale.US).endsWith(".pnach")) {
+                    if (TextUtils.isEmpty(displayName)) displayName = "customcheats.pnach";
+                    if (!displayName.toLowerCase(Locale.US).endsWith(".pnach"))
                         displayName = displayName + ".pnach";
-                    }
+
                     File destination = createUniqueFile(cheatsDir, displayName);
-                    try (InputStream in = getContentResolver().openInputStream(uri);
-                         OutputStream out = new FileOutputStream(destination)) {
+
+                    try {
+                        InputStream in = getContentResolver().openInputStream(uri);
                         if (in == null) {
                             throw new IOException("Cheat source stream unavailable.");
                         }
-                        byte[] buffer = new byte[8192];
-                        int read;
-                        while ((read = in.read(buffer)) != -1) {
-                            out.write(buffer, 0, read);
+
+                        BufferedReader br = new BufferedReader(
+                            new InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8));
+                        java.io.FileWriter fw = new FileWriter(destination);
+                        String line;
+
+                        while ((line = br.readLine()) != null) {
+                            String trimmed = line.trim();
+
+                            // Empty lines
+                            if (trimmed.isEmpty()) {
+                                fw.write("
+");
+                                continue;
+                            }
+
+                            // Comments
+                            if (trimmed.startsWith("//")) {
+                                fw.write(trimmed);
+                                fw.write("
+");
+                                continue;
+                            }
+
+                            // Brackets
+                            if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+                                if (trimmed.length() > 2) {
+                                    String sectionName = trimmed.substring(1, trimmed.length() - 1).trim();
+                                    fw.write("[");
+                                    fw.write(sectionName);
+                                    fw.write("]
+");
+                                }
+                                continue;
+                            }
+                            fw.write(trimmed);
+                            fw.write("
+");
                         }
-                        out.flush();
+                        fw.flush();
+                        fw.close();
+                        br.close();
+                        in.close();
+
                         success = true;
                         targetName = destination.getName();
+
                     } catch (Exception e) {
                         errorReason = e.getMessage();
-                        if (errorReason == null || errorReason.trim().isEmpty()) {
+                        if (errorReason == null || errorReason.trim().isEmpty())
                             errorReason = e.getClass().getSimpleName();
-                        }
                         try { DebugLog.e("Cheats", "Import failed: " + errorReason); } catch (Throwable ignored) {}
                     }
                 }
@@ -3216,12 +3256,13 @@ public class MainActivity extends AppCompatActivity {
             boolean finalSuccess = success;
             String finalName = targetName;
             String finalError = errorReason;
+
             runOnUiThread(() -> {
                 Toast.makeText(MainActivity.this,
-                        finalSuccess
-                                ? getString(R.string.drawer_toast_cheats_import_success, finalName)
-                                : getString(R.string.drawer_toast_cheats_import_failed),
-                        Toast.LENGTH_SHORT).show();
+                     finalSuccess ? getString(R.string.drawer_toast_cheats_import_success, finalName)
+                                 : getString(R.string.drawer_toast_cheats_import_failed),
+                    Toast.LENGTH_SHORT).show();
+
                 if (finalSuccess) {
                     try {
                         NativeApp.setEnableCheats(true);
