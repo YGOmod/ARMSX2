@@ -3208,16 +3208,13 @@ public class MainActivity extends AppCompatActivity {
 
                             // Empty lines
                             if (trimmed.isEmpty()) {
-                                fw.write("
-");
+                                fw.write("\n");
                                 continue;
                             }
 
                             // Comments
                             if (trimmed.startsWith("//")) {
-                                fw.write(trimmed);
-                                fw.write("
-");
+                                fw.write(trimmed + "\n");
                                 continue;
                             }
 
@@ -3225,16 +3222,11 @@ public class MainActivity extends AppCompatActivity {
                             if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
                                 if (trimmed.length() > 2) {
                                     String sectionName = trimmed.substring(1, trimmed.length() - 1).trim();
-                                    fw.write("[");
-                                    fw.write(sectionName);
-                                    fw.write("]
-");
+                                    fw.write("[" + sectionName + "]\n");
                                 }
                                 continue;
                             }
-                            fw.write(trimmed);
-                            fw.write("
-");
+                            fw.write(trimmed + "\n");
                         }
                         fw.flush();
                         fw.close();
