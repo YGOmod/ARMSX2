@@ -1437,7 +1437,81 @@ Java_kr_co_iefriends_pcsx2_utils_RetroAchievementsBridge_nativeSetHardcore(JNIEn
     NotifyRetroAchievementsState();
 }
 
+/// Patches
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_kr_co_iefriends_pcsx2_NativeApp_getAvailablePatches(JNIEnv* env, jclass)
+{
+    std::vector<std::string> patch_names;
 
+    for (const auto& group : Patch::s_cheat_patches)
+    {
+        if (!group.name.empty())
+            patch_names.push_back(group.name);
+    }
+    
+    jobjectArray result = env->NewObjectArray(patch_names.size(), 
+        env->FindClass("java/lang/String"), nullptr);
+
+    for (size_t i = 0; i < patch_names.size(); i++)
+    {
+        env->SetObjectArrayElement(result, i, 
+            env->NewStringUTF(patch_names[i].c_str()));
+    }
+
+    return result;
+}
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_kr_co_iefriends_pcsx2_NativeApp_isPatchEnabled(JNIEnv* env, jclass, jstring patchName)
+{
+    const char* name = env->GetStringUTFChars(patchName, nullptr);
+    
+    bool enabled = std::find(Patch::s_enabled_cheats.begin(), 
+                            Patch::s_enabled_cheats.end(), 
+                            name) != Patch::s_enabled_cheats.end();
+
+    env->ReleaseStringUTFChars(patchName, name);
+    return enabled;
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_kr_co_iefriends_pcsx2_NativeApp_setPatchEnabled(JNIEnv* env, jclass, jstring patchName, jboolean enabled)
+{
+    const char* name = env->GetStringUTFChars(patchName, nullptr);
+    std::string patch_name(name);
+
+    if (enabled)
+    {
+        // Add to enabled list
+        if (std::find(Patch::s_enabled_cheats.begin(), 
+                     Patch::s_enabled_cheats.end(), 
+                     patch_name) == Patch::s_enabled_cheats.end())
+        {
+            Patch::s_enabled_cheats.push_back(patch_name);
+        }
+    }
+    else
+    {
+        // Remove from enabled list
+        auto it = std::find(Patch::s_enabled_cheats.begin(),
+                           Patch::s_enabled_cheats.end(),
+                           patch_name);
+        if (it != Patch::s_enabled_cheats.end())
+            Patch::s_enabled_cheats.erase(it);
+    }
+
+    // Save to config
+    Host::SetStringListSetting(Patch::CHEATS_CONFIG_SECTION,
+                               Patch::PATCH_ENABLE_CONFIG_KEY,
+                               Patch::s_enabled_cheats);
+
+    // Reload patches
+    Patch::UpdateActivePatches(false, false, false, true);
+    
+    env->ReleaseStringUTFChars(patchName, name);
+}
+///
 void Host::CommitBaseSettingChanges()
 {
     auto lock = GetSettingsLock();

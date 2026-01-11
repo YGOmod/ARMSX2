@@ -159,4 +159,9 @@ public class NativeApp {
     public static native void setCustomDriverPath(String path);
     public static native String getCustomDriverPath();
     public static native void setNativeLibraryDir(String path);
+
+    //patches
+    public static native String[] getAvailablePatches();
+    public static native boolean isPatchEnabled(String patchName);
+    public static native void setPatchEnabled(String patchName, boolean enabled);
 }

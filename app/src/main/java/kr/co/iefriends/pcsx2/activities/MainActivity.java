@@ -3165,6 +3165,57 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void showPatchManagerDialog() {
+        if (!TextUtils.isEmpty(mszGamefile)) {
+            Toast.makeText(this, "Load a game first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+    
+        try {
+            String[] patches = NativeApp.getAvailablePatches();
+        
+            if (patches == null || patches.length == 0) {
+                Toast.makeText(this, "No patches found for this game", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        
+            // Track which patches are enabled
+            boolean[] checkedItems = new boolean[patches.length];
+            for (int i = 0; i < patches.length; i++) {
+                checkedItems[i] = NativeApp.isPatchEnabled(patches[i]);
+            }
+        
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Manage Cheats")
+                    .setMultiChoiceItems(patches, checkedItems, (dialog, which, isChecked) -> {
+                try {
+                    NativeApp.setPatchEnabled(patches[which], isChecked);
+                    Toast.makeText(MainActivity.this, 
+                        (isChecked ? "Enabled: " : "Disabled: ") + patches[which], 
+                        Toast.LENGTH_SHORT).show();
+                } catch (Throwable e) {
+                    Toast.makeText(MainActivity.this, 
+                        "Failed to toggle patch", 
+                        Toast.LENGTH_SHORT).show();
+                }
+            })
+                    .setPositiveButton("Close", null)
+                    .show();
+        } catch (Throwable e) {
+            Toast.makeText(this, "Failed to load patches", Toast.LENGTH_SHORT).show();
+        }
+    }
+    View btnManagePatches = findViewById(R.id.drawer_btn_manage_patches);
+    if (btnManagePatches != null) {
+        btnManagePatches.setOnClickListener(v -> {
+            try {
+                if (inGameDrawer != null) {
+                    inGameDrawer.closeDrawer(GravityCompat.START);
+                }
+            } catch (Throwable ignored) {}
+            showPatchManagerDialog();
+        });
+    }
     private void importCheatFile(Uri uri) {
         if (uri == null) {
         	return;
