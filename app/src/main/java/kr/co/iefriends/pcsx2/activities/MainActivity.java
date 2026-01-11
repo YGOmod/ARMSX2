@@ -3199,8 +3199,10 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         BufferedReader br = new BufferedReader(
-                            new InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8));
-                        java.io.FileWriter fw = new FileWriter(destination);
+                             new InputStreamReader(in, StandardCharsets.UTF_8));
+                        OutputStream os = new FileOutputStream(destination);
+                        BufferedWriter bw = new BufferedWriter(
+                             new OutputStreamWriter(os, StandardCharsets.UTF_8));
                         String line;
 
                         while ((line = br.readLine()) != null) {
@@ -3208,13 +3210,13 @@ public class MainActivity extends AppCompatActivity {
 
                             // Empty lines
                             if (trimmed.isEmpty()) {
-                                fw.write("\n");
+                                bw.write("\n");
                                 continue;
                             }
 
                             // Comments
                             if (trimmed.startsWith("//")) {
-                                fw.write(trimmed + "\n");
+                                bw.write(trimmed + "\n");
                                 continue;
                             }
 
@@ -3222,14 +3224,15 @@ public class MainActivity extends AppCompatActivity {
                             if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
                                 if (trimmed.length() > 2) {
                                     String sectionName = trimmed.substring(1, trimmed.length() - 1).trim();
-                                    fw.write("[" + sectionName + "]\n");
+                                    bw.write("[" + sectionName + "]\n");
                                 }
                                 continue;
                             }
-                            fw.write(trimmed + "\n");
+                            bw.write(trimmed + "\n");
                         }
-                        fw.flush();
-                        fw.close();
+                        bw.flush();
+                        bw.close();
+                        os.close();
                         br.close();
                         in.close();
 
